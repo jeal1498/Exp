@@ -28,7 +28,7 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 | 2 | Autenticación Médica y Políticas RLS (Seguridad NOM-024) | ✅ COMPLETADA |
 | 3 | Middleware de Protección y Ficha de Identificación (NOM-004) | ✅ COMPLETADA |
 | 4 | Módulo Clínico de Neuropsicología (Evaluaciones y Pruebas) | 🔒 PENDIENTE |
-| 5 | Notas de Evolución e Inalterabilidad (Bloqueo Legal) | 🔒 PENDIENTE |
+| 5 | Notas de Evolución e Inalterabilidad (Bloqueo Legal) | ✅ COMPLETADA |
 | 6 | Integraciones de Salida (Storage y Alertas por Correo) | 🔒 PENDIENTE |
 
 ---
@@ -89,9 +89,9 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 
 ## Estado Actual del Proyecto
 
-**Sesión activa:** Sesión 4 — Etapa 3  
+**Sesión activa:** Sesión 5 — Etapa 5  
 **Última actualización:** 2026-06-24  
-**Próxima etapa a desbloquear:** Etapa 4 (requiere autorización del usuario)
+**Próxima etapa a desbloquear:** Etapa 6 (requiere autorización del usuario)
 
 ---
 
@@ -174,6 +174,19 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 - `src/app/dashboard/actions.ts` — Server Action `signOutAction` para el botón de cierre de sesión.
 
 **Estado al cerrar sesión:** Etapa 3 COMPLETADA. Esperando autorización del usuario para iniciar Etapa 4.
+
+### Sesión 5 — 2026-06-24
+**Objetivo:** Etapa 5 — Notas de Evolución e Inalterabilidad.  
+**Logrado:**
+- `src/app/dashboard/pacientes/page.tsx` — filas de pacientes con enlace clickeable a su expediente.
+- `src/app/dashboard/pacientes/[pacienteId]/page.tsx` — hub del expediente con datos del paciente y acceso a módulos.
+- `src/app/dashboard/pacientes/[pacienteId]/notas/page.tsx` — lista de notas SOAP con indicador de estado (Borrador / Bloqueada) y auditoría SELECT (NOM-024).
+- `src/app/dashboard/pacientes/[pacienteId]/notas/nueva/actions.ts` — Server Action `crearNota` con validación de al menos un campo SOAP.
+- `src/app/dashboard/pacientes/[pacienteId]/notas/nueva/page.tsx` — formulario SOAP con selector CIE-11 via `<datalist>` (15 códigos de neuropsicología).
+- `src/app/dashboard/pacientes/[pacienteId]/notas/[notaId]/actions.ts` — Server Action `bloquearNota`: SHA-256 del contenido de la nota, bloqueo atómico con guard `.eq('is_locked', false)`, NOM-024.
+- `src/app/dashboard/pacientes/[pacienteId]/notas/[notaId]/page.tsx` — detalle de nota con botón de bloqueo irreversible y visualización de hash SHA-256 y `locked_at` para notas bloqueadas.
+
+**Estado al cerrar sesión:** Etapa 5 COMPLETADA. Esperando autorización del usuario para iniciar Etapa 6.
 
 ---
 

@@ -42,7 +42,9 @@ export default async function PacientesPage() {
               <tr key={p.id}>
                 <td>{p.numero_expediente}</td>
                 <td>
-                  {p.nombre} {p.apellido_paterno} {p.apellido_materno ?? ''}
+                  <a href={`/dashboard/pacientes/${p.id}`}>
+                    {p.nombre} {p.apellido_paterno} {p.apellido_materno ?? ''}
+                  </a>
                 </td>
                 <td>
                   <code>{p.curp}</code>
