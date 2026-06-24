@@ -3,6 +3,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { createHash } from 'crypto'
+import { sendNotaLockedEmail } from '@/lib/resend'
 
 export async function bloquearNota(
   pacienteId: string,
@@ -61,6 +62,17 @@ export async function bloquearNota(
     redirect(
       `/dashboard/pacientes/${pacienteId}/notas/${notaId}?error=${encodeURIComponent('Error al bloquear: ' + updateError.message)}`
     )
+  }
+
+  const lockedAt = new Date().toISOString()
+  if (userData.user.email) {
+    await sendNotaLockedEmail({
+      to: userData.user.email,
+      notaId,
+      pacienteId,
+      lockedAt,
+      hashIntegridad: hash,
+    })
   }
 
   redirect(`/dashboard/pacientes/${pacienteId}/notas/${notaId}`)

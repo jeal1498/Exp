@@ -29,7 +29,7 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 | 3 | Middleware de Protección y Ficha de Identificación (NOM-004) | ✅ COMPLETADA |
 | 4 | Módulo Clínico de Neuropsicología (Evaluaciones y Pruebas) | ✅ COMPLETADA |
 | 5 | Notas de Evolución e Inalterabilidad (Bloqueo Legal) | ✅ COMPLETADA |
-| 6 | Integraciones de Salida (Storage y Alertas por Correo) | 🔒 PENDIENTE |
+| 6 | Integraciones de Salida (Storage y Alertas por Correo) | ✅ COMPLETADA |
 
 ---
 
@@ -89,9 +89,9 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 
 ## Estado Actual del Proyecto
 
-**Sesión activa:** Sesión 6 — Etapa 4  
+**Sesión activa:** Sesión 7 — Etapa 6  
 **Última actualización:** 2026-06-24  
-**Próxima etapa a desbloquear:** Etapa 6 (requiere autorización del usuario)
+**Próxima etapa a desbloquear:** Ninguna (proyecto completo)
 
 ---
 
@@ -198,6 +198,40 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 - `src/app/dashboard/pacientes/[pacienteId]/page.tsx` — Enlace a "Evaluaciones Neuropsicológicas" agregado en los módulos del expediente.
 
 **Estado al cerrar sesión:** Etapa 4 COMPLETADA. Esperando autorización del usuario para iniciar Etapa 6.
+
+---
+
+### Sesión 7 — 2026-06-24
+**Objetivo:** Etapa 6 — Integraciones de Salida (Storage y Alertas por Correo).  
+**Logrado:**
+- `supabase/migrations/20260624000007_storage_buckets.sql` — Dos buckets privados con RLS AAL2:
+  - `reportes-escaneados` (20 MB, PDF/JPEG/PNG/WEBP) con políticas SELECT/INSERT/DELETE.
+  - `consentimientos-firmados` (10 MB, PDF/JPEG/PNG) con políticas SELECT/INSERT/DELETE.
+  - Sin política UPDATE: inalterabilidad de archivos conforme a NOM-004.
+  - Estructura de rutas: `{userId}/{pacienteId}/{timestamp}-{filename}`.
+- `src/lib/resend.ts` — Cliente Resend con dos funciones de notificación:
+  - `sendLoginAlertEmail()` — alerta de seguridad tras inicio de sesión exitoso.
+  - `sendNotaLockedEmail()` — notificación al especialista al bloquear nota (incluye hash SHA-256).
+  - Manejo de errores fire-and-forget: falla de correo no interrumpe flujo principal.
+- `src/lib/storage.ts` — Helpers de Supabase Storage:
+  - `uploadDocumento()` — sube archivo a bucket con path único (timestamp).
+  - `listDocumentos()` — lista archivos con URLs firmadas de 1 hora.
+  - `deleteDocumento()` — elimina archivo por path.
+- `src/app/dashboard/pacientes/[pacienteId]/documentos/actions.ts` — Server Actions:
+  - `subirDocumento()` — valida tipo MIME, sube a Storage, registra en `logs_auditoria`.
+  - `eliminarDocumento()` — valida ownership de path, elimina de Storage, audita.
+- `src/app/dashboard/pacientes/[pacienteId]/documentos/page.tsx` — UI de documentos:
+  - Tabs para alternar entre buckets vía `?bucket=` searchParam.
+  - Formulario de carga con `encType="multipart/form-data"`.
+  - Tabla de archivos con nombre, tamaño, fecha, enlace de descarga (URL firmada) y botón de eliminación.
+- `next.config.ts` — Agrega `serverActions.bodySizeLimit: '21mb'` para soportar PDFs de hasta 20 MB.
+- `package.json` — Agrega dependencia `resend@^4.8.0`.
+- `.env.example` — Agrega `RESEND_FROM_EMAIL`.
+- `src/app/(auth)/login/actions.ts` — Dispara `sendLoginAlertEmail()` tras autenticación exitosa.
+- `src/app/dashboard/pacientes/[pacienteId]/notas/[notaId]/actions.ts` — Dispara `sendNotaLockedEmail()` tras bloqueo de nota con hash SHA-256.
+- `src/app/dashboard/pacientes/[pacienteId]/page.tsx` — Enlace al módulo "Documentos Adjuntos".
+
+**Estado al cerrar sesión:** Etapa 6 COMPLETADA. Proyecto finalizado en su totalidad.
 
 ---
 

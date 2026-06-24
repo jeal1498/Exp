@@ -117,6 +117,11 @@ export default async function PacienteDetallePage({
                 Notas de Evolución (SOAP)
               </a>
             </li>
+            <li>
+              <a href={`/dashboard/pacientes/${pacienteId}/documentos`}>
+                Documentos Adjuntos
+              </a>
+            </li>
           </ul>
 
           <p style={{ marginTop: '16px' }}>
