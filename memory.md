@@ -27,7 +27,7 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 | 1 | Infraestructura Base y Seguridad (Supabase & Configs) | ✅ COMPLETADA |
 | 2 | Autenticación Médica y Políticas RLS (Seguridad NOM-024) | ✅ COMPLETADA |
 | 3 | Middleware de Protección y Ficha de Identificación (NOM-004) | ✅ COMPLETADA |
-| 4 | Módulo Clínico de Neuropsicología (Evaluaciones y Pruebas) | 🔒 PENDIENTE |
+| 4 | Módulo Clínico de Neuropsicología (Evaluaciones y Pruebas) | ✅ COMPLETADA |
 | 5 | Notas de Evolución e Inalterabilidad (Bloqueo Legal) | ✅ COMPLETADA |
 | 6 | Integraciones de Salida (Storage y Alertas por Correo) | 🔒 PENDIENTE |
 
@@ -89,7 +89,7 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 
 ## Estado Actual del Proyecto
 
-**Sesión activa:** Sesión 5 — Etapa 5  
+**Sesión activa:** Sesión 6 — Etapa 4  
 **Última actualización:** 2026-06-24  
 **Próxima etapa a desbloquear:** Etapa 6 (requiere autorización del usuario)
 
@@ -187,6 +187,17 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 - `src/app/dashboard/pacientes/[pacienteId]/notas/[notaId]/page.tsx` — detalle de nota con botón de bloqueo irreversible y visualización de hash SHA-256 y `locked_at` para notas bloqueadas.
 
 **Estado al cerrar sesión:** Etapa 5 COMPLETADA. Esperando autorización del usuario para iniciar Etapa 6.
+
+### Sesión 6 — 2026-06-24
+**Objetivo:** Etapa 4 — Módulo Clínico de Neuropsicología.  
+**Logrado:**
+- `src/app/dashboard/pacientes/[pacienteId]/evaluaciones/page.tsx` — Lista de evaluaciones con tabla y gráfico SVG de barras de percentiles por dominio cognitivo (8 dominios, coloreado por rango: rojo/naranja/verde).
+- `src/app/dashboard/pacientes/[pacienteId]/evaluaciones/nueva/actions.ts` — Server Action `crearEvaluacion`: validación de campos obligatorios (fecha, prueba, dominio), validación de rango percentil 0–100, inserción en `evaluaciones_neuro` con `created_by`.
+- `src/app/dashboard/pacientes/[pacienteId]/evaluaciones/nueva/page.tsx` — Formulario con datalist de 13 pruebas comunes (WAIS-IV, WISC-V, TMT-A/B, Stroop, FAS, BNT, RAVLT, RBMT, SDMT, Figura de Rey, MMSE, MoCA), selector de 8 dominios cognitivos, campos numéricos para puntaje bruto, percentil y puntuación estándar.
+- `src/app/dashboard/pacientes/[pacienteId]/evaluaciones/[evaluacionId]/page.tsx` — Vista de detalle con indicador gráfico SVG de percentil (barra horizontal coloreada con marcadores de referencia en 25 y 75), visualización de datos adicionales JSONB si existen, auditoría NOM-024.
+- `src/app/dashboard/pacientes/[pacienteId]/page.tsx` — Enlace a "Evaluaciones Neuropsicológicas" agregado en los módulos del expediente.
+
+**Estado al cerrar sesión:** Etapa 4 COMPLETADA. Esperando autorización del usuario para iniciar Etapa 6.
 
 ---
 

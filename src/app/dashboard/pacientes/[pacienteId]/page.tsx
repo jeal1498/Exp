@@ -108,6 +108,11 @@ export default async function PacienteDetallePage({
           <h2>Módulos del expediente</h2>
           <ul>
             <li>
+              <a href={`/dashboard/pacientes/${pacienteId}/evaluaciones`}>
+                Evaluaciones Neuropsicológicas
+              </a>
+            </li>
+            <li>
               <a href={`/dashboard/pacientes/${pacienteId}/notas`}>
                 Notas de Evolución (SOAP)
               </a>
