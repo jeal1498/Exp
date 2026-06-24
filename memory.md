@@ -26,7 +26,7 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 | 0 | Inicialización de Memoria y Archivos Base | ✅ COMPLETADA |
 | 1 | Infraestructura Base y Seguridad (Supabase & Configs) | ✅ COMPLETADA |
 | 2 | Autenticación Médica y Políticas RLS (Seguridad NOM-024) | ✅ COMPLETADA |
-| 3 | Middleware de Protección y Ficha de Identificación (NOM-004) | 🔒 PENDIENTE |
+| 3 | Middleware de Protección y Ficha de Identificación (NOM-004) | ✅ COMPLETADA |
 | 4 | Módulo Clínico de Neuropsicología (Evaluaciones y Pruebas) | 🔒 PENDIENTE |
 | 5 | Notas de Evolución e Inalterabilidad (Bloqueo Legal) | 🔒 PENDIENTE |
 | 6 | Integraciones de Salida (Storage y Alertas por Correo) | 🔒 PENDIENTE |
@@ -89,9 +89,9 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 
 ## Estado Actual del Proyecto
 
-**Sesión activa:** Sesión 3 — Etapa 2  
+**Sesión activa:** Sesión 4 — Etapa 3  
 **Última actualización:** 2026-06-24  
-**Próxima etapa a desbloquear:** Etapa 3 (requiere autorización del usuario)
+**Próxima etapa a desbloquear:** Etapa 4 (requiere autorización del usuario)
 
 ---
 
@@ -141,6 +141,39 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 - `src/app/(auth)/verify-mfa/page.tsx` + `actions.ts` — verificación TOTP con elevación a AAL2.
 
 **Estado al cerrar sesión:** Etapa 2 COMPLETADA. Esperando autorización del usuario para iniciar Etapa 3.
+
+### Sesión 4 — 2026-06-24
+**Objetivo:** Etapa 3 — Middleware de Protección y Ficha de Identificación.  
+**Logrado:**
+- `src/middleware.ts` — Middleware de protección de rutas `/dashboard`:
+  - Sin sesión → redirige a `/login?redirect=...`.
+  - AAL1 (MFA no verificado) + factor TOTP inscrito → redirige a `/verify-mfa?factorId=...`.
+  - AAL1 sin MFA inscrito → redirige a `/enroll-mfa`.
+  - AAL2 → deja pasar (refresca cookies de sesión).
+- `src/lib/curp.ts` — Validación de CURP con regex NOM-004 + dígito verificador (algoritmo RENAPO):
+  - Mapa de valores de caracteres (0-9 → 0-36, A-Z con Ñ).
+  - Pesos posicionales (18 a 1 para las primeras 17 posiciones).
+  - Verificación: `(10 - suma % 10) % 10 === dígito[17]`.
+- `src/app/(auth)/enroll-mfa/page.tsx` + `actions.ts` — Inscripción MFA con QR TOTP y verificación.
+- `src/app/dashboard/layout.tsx` — Layout del dashboard con nav, correo del usuario y botón de cierre de sesión.
+- `src/app/dashboard/page.tsx` — Panel principal con conteo de pacientes activos y accesos rápidos.
+- `src/app/dashboard/pacientes/page.tsx` — Lista de pacientes activos con número de expediente, nombre, CURP y fecha.
+- `src/app/dashboard/pacientes/nuevo/page.tsx` — Formulario de alta con todos los campos NOM-004:
+  - Nombre completo, fecha de nacimiento, sexo.
+  - CURP (con validación cliente-side de 18 chars + server-side con dígito verificador).
+  - Lateralidad (Diestro / Zurdo / Ambidiestro) — obligatorio para neuropsicología.
+  - Escolaridad (12 niveles) — obligatorio para neuropsicología.
+  - Campos opcionales: ocupación, domicilio, teléfono, email, motivo de consulta.
+  - Checkbox de consentimiento informado (Art. 7 NOM-004) — bloquea el submit si no está marcado.
+- `src/app/dashboard/pacientes/nuevo/actions.ts` — Server Action `crearPaciente`:
+  - Valida CURP con `validarCURP()` antes de insertar.
+  - Genera `numero_expediente` como `EXP-{año}-{timestamp[-7]}`.
+  - Maneja error 23505 (CURP duplicada) con mensaje legible.
+  - Registra `consentimiento_fecha` con la fecha del día.
+- `src/app/page.tsx` — Redirige automáticamente a `/dashboard`.
+- `src/app/dashboard/actions.ts` — Server Action `signOutAction` para el botón de cierre de sesión.
+
+**Estado al cerrar sesión:** Etapa 3 COMPLETADA. Esperando autorización del usuario para iniciar Etapa 4.
 
 ---
 
