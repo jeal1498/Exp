@@ -1,0 +1,25 @@
+'use server'
+
+import { redirect } from 'next/navigation'
+import { signInWithPassword } from '@/lib/supabase/auth'
+
+export async function signIn(formData: FormData): Promise<never> {
+  const email = formData.get('email') as string
+  const password = formData.get('password') as string
+  const redirectTo = (formData.get('redirectTo') as string) || '/dashboard'
+
+  const result = await signInWithPassword(email, password)
+
+  if (result.error) {
+    redirect(`/login?error=${encodeURIComponent('Credenciales incorrectas. Intente de nuevo.')}`)
+  }
+
+  if (result.data.requiresMfa) {
+    redirect(
+      `/verify-mfa?factorId=${result.data.factorId}&redirect=${encodeURIComponent(redirectTo)}`,
+    )
+  }
+
+  // MFA no inscrito: obligar inscripción (MFA es mandatoria para sistema clínico)
+  redirect('/enroll-mfa')
+}
