@@ -150,3 +150,4 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 2. Al completar una etapa: actualizar este archivo, marcar como COMPLETADA, detenerse.
 3. No enlazar etapas dentro de la misma sesión bajo ninguna circunstancia.
 4. La siguiente etapa solo inicia con autorización explícita del usuario en una nueva sesión.
+5. Al finalizar cada etapa: hacer merge directo de la rama de trabajo a `main` y push a origin. No crear Pull Requests.
