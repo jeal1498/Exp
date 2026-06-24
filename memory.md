@@ -25,7 +25,7 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 |---|-------|--------|
 | 0 | Inicialización de Memoria y Archivos Base | ✅ COMPLETADA |
 | 1 | Infraestructura Base y Seguridad (Supabase & Configs) | ✅ COMPLETADA |
-| 2 | Autenticación Médica y Políticas RLS (Seguridad NOM-024) | 🔒 PENDIENTE |
+| 2 | Autenticación Médica y Políticas RLS (Seguridad NOM-024) | ✅ COMPLETADA |
 | 3 | Middleware de Protección y Ficha de Identificación (NOM-004) | 🔒 PENDIENTE |
 | 4 | Módulo Clínico de Neuropsicología (Evaluaciones y Pruebas) | 🔒 PENDIENTE |
 | 5 | Notas de Evolución e Inalterabilidad (Bloqueo Legal) | 🔒 PENDIENTE |
@@ -89,9 +89,9 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 
 ## Estado Actual del Proyecto
 
-**Sesión activa:** Sesión 2 — Etapa 1  
+**Sesión activa:** Sesión 3 — Etapa 2  
 **Última actualización:** 2026-06-24  
-**Próxima etapa a desbloquear:** Etapa 2 (requiere autorización del usuario)
+**Próxima etapa a desbloquear:** Etapa 3 (requiere autorización del usuario)
 
 ---
 
@@ -124,6 +124,23 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
   - `20260624000005_create_logs_auditoria.sql` — Inmutabilidad total, triggers anti-UPDATE/DELETE, NOM-024.
 
 **Estado al cerrar sesión:** Etapa 1 COMPLETADA. Esperando autorización del usuario para iniciar Etapa 2.
+
+### Sesión 3 — 2026-06-24
+**Objetivo:** Etapa 2 — Autenticación Médica y Políticas RLS.  
+**Logrado:**
+- Migración SQL `20260624000006_rls_and_audit_triggers.sql`:
+  - RLS habilitado en las 5 tablas con condición AAL2 (MFA obligatoria a nivel DB).
+  - Políticas SELECT/INSERT/UPDATE para `pacientes` (ownership via `created_by`).
+  - Políticas SELECT/INSERT/UPDATE para `anamnesis`, `evaluaciones_neuro`, `notas_evolucion` (ownership via EXISTS en `pacientes`).
+  - Políticas SELECT/INSERT para `logs_auditoria` (inmutabilidad garantizada por triggers de Etapa 1).
+  - Función `public.audit_log()` con SECURITY DEFINER para registrar INSERT/UPDATE/DELETE automáticamente.
+  - Triggers AFTER en las 4 tablas de datos clínicos.
+- `src/lib/supabase/auth.ts` — helpers server-side: signIn, signOut, getUser, getSession, enrollMFA, verifyMFAEnrollment, challengeMFA, verifyMFA.
+- `src/app/(auth)/layout.tsx` — layout del grupo de rutas de autenticación.
+- `src/app/(auth)/login/page.tsx` + `actions.ts` — página de inicio de sesión con Server Action de dos pasos.
+- `src/app/(auth)/verify-mfa/page.tsx` + `actions.ts` — verificación TOTP con elevación a AAL2.
+
+**Estado al cerrar sesión:** Etapa 2 COMPLETADA. Esperando autorización del usuario para iniciar Etapa 3.
 
 ---
 
