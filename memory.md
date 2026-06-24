@@ -24,7 +24,7 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 | # | Etapa | Estado |
 |---|-------|--------|
 | 0 | Inicialización de Memoria y Archivos Base | ✅ COMPLETADA |
-| 1 | Infraestructura Base y Seguridad (Supabase & Configs) | 🔒 PENDIENTE |
+| 1 | Infraestructura Base y Seguridad (Supabase & Configs) | ✅ COMPLETADA |
 | 2 | Autenticación Médica y Políticas RLS (Seguridad NOM-024) | 🔒 PENDIENTE |
 | 3 | Middleware de Protección y Ficha de Identificación (NOM-004) | 🔒 PENDIENTE |
 | 4 | Módulo Clínico de Neuropsicología (Evaluaciones y Pruebas) | 🔒 PENDIENTE |
@@ -89,9 +89,9 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 
 ## Estado Actual del Proyecto
 
-**Sesión activa:** Sesión 1 — Paso 0  
+**Sesión activa:** Sesión 2 — Etapa 1  
 **Última actualización:** 2026-06-24  
-**Próxima etapa a desbloquear:** Etapa 1 (requiere autorización del usuario)
+**Próxima etapa a desbloquear:** Etapa 2 (requiere autorización del usuario)
 
 ---
 
@@ -105,6 +105,25 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 - Commit inicial en rama `claude/neuropsych-clinical-records-j80gwi`.
 
 **Estado al cerrar sesión:** Paso 0 COMPLETADO. Esperando autorización del usuario para iniciar Etapa 1 en nueva sesión.
+
+### Sesión 2 — 2026-06-24
+**Objetivo:** Etapa 1 — Infraestructura Base y Seguridad.
+**Logrado:**
+- Creada rama `claude/stage-1-memory-xbz3ay` desde `claude/neuropsych-clinical-records-j80gwi`.
+- Boilerplate Next.js 14 + Supabase: `package.json`, `next.config.ts`, `tsconfig.json`.
+- App Router mínimo: `src/app/layout.tsx`, `src/app/page.tsx`.
+- Clientes Supabase tipados: `src/lib/supabase/client.ts`, `src/lib/supabase/server.ts`.
+- Tipos TypeScript del esquema: `src/types/database.types.ts`.
+- Config Supabase CLI: `supabase/config.toml`.
+- Variables de entorno: `.env.example`.
+- 5 migraciones SQL con cumplimiento normativo:
+  - `20260624000001_create_pacientes.sql` — CURP único, consentimiento informado, validación regex NOM-004.
+  - `20260624000002_create_anamnesis.sql` — Historia clínica con JSONB flexible.
+  - `20260624000003_create_evaluaciones_neuro.sql` — ENUM de dominios cognitivos, percentil validado.
+  - `20260624000004_create_notas_evolucion.sql` — SOAP + CIE-11 + trigger de inalterabilidad NOM-004.
+  - `20260624000005_create_logs_auditoria.sql` — Inmutabilidad total, triggers anti-UPDATE/DELETE, NOM-024.
+
+**Estado al cerrar sesión:** Etapa 1 COMPLETADA. Esperando autorización del usuario para iniciar Etapa 2.
 
 ---
 
