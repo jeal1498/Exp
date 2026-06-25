@@ -54,9 +54,56 @@
   align-items: start;
 }
 
-@media (max-width: 900px) {
+/* Tablet: sidebar se apila (≤768px) */
+@media (max-width: 768px) {
+  .page {
+    gap: var(--space-lg);
+  }
   .content {
     grid-template-columns: 1fr;
+    gap: var(--space-lg);
+  }
+
+  /* Acciones rápidas suben al tope en móvil/tablet */
+  .sidebar {
+    order: -1;
+    gap: var(--space-lg);
+  }
+
+  /* En tablet las acciones van en fila */
+  .actions {
+    flex-direction: row;
+  }
+
+  .btnPrimary,
+  .btnGhost {
+    flex: 1;
+  }
+}
+
+/* Mobile: ajustes adicionales (≤480px) */
+@media (max-width: 480px) {
+  .statsStrip {
+    grid-template-columns: 1fr;
+  }
+
+  .stat + .stat {
+    border-left: none;
+    border-top: 1px solid var(--color-border);
+  }
+
+  /* Acciones vuelven a columna en pantalla muy pequeña */
+  .actions {
+    flex-direction: column;
+  }
+
+  .statValue {
+    font-size: var(--text-title);
+  }
+
+  .sectionTitle {
+    font-size: var(--text-body);
+    font-weight: var(--weight-bold);
   }
 }
 
@@ -92,12 +139,18 @@
 }
 
 /* ─── Patients table ─────────────────────────────────────────────────────── */
+.tableWrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
 .table {
   width: 100%;
   border-collapse: collapse;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  overflow: hidden;
+  min-width: 480px;
 }
 
 .th {

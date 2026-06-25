@@ -120,6 +120,7 @@ export default async function DashboardPage() {
           {recentPacientesList.length === 0 ? (
             <p className={styles.empty}>No hay expedientes registrados aún.</p>
           ) : (
+            <div className={styles.tableWrapper}>
             <table className={styles.table}>
               <thead>
                 <tr>
@@ -156,6 +157,7 @@ export default async function DashboardPage() {
                 ))}
               </tbody>
             </table>
+            </div>
           )}
         </section>
 
