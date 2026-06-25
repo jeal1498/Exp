@@ -89,9 +89,9 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 
 ## Estado Actual del Proyecto
 
-**Sesión activa:** Sesión 7 — Etapa 6  
-**Última actualización:** 2026-06-24  
-**Próxima etapa a desbloquear:** Ninguna (proyecto completo)
+**Sesión activa:** Sesión 8 — Integración Supabase  
+**Última actualización:** 2026-06-25  
+**Próxima etapa a desbloquear:** Ninguna (proyecto completo, build limpio, listo para Vercel)
 
 ---
 
@@ -232,6 +232,34 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 - `src/app/dashboard/pacientes/[pacienteId]/page.tsx` — Enlace al módulo "Documentos Adjuntos".
 
 **Estado al cerrar sesión:** Etapa 6 COMPLETADA. Proyecto finalizado en su totalidad.
+
+---
+
+### Sesión 8 — 2026-06-25
+**Objetivo:** Desplegar el esquema real en Supabase y corregir incompatibilidades de SDK.  
+**Contexto:** El proyecto estaba completo en código pero nunca se había integrado con una instancia real de Supabase. El proyecto de Supabase (`mxcmfhxnjcwoueqwvzyb`) estaba inactivo.
+
+**Logrado:**
+- Restaurado el proyecto Supabase inactivo vía MCP (`restore_project`).
+- Desplegadas las 7 migraciones SQL vía `execute_sql` (la herramienta `apply_migration` retornaba `{success: true}` silenciosamente sin aplicar cambios):
+  - `create_pacientes`, `create_anamnesis`, `create_evaluaciones_neuro`, `create_notas_evolucion`, `create_logs_auditoria`, `rls_and_audit_triggers`, `storage_buckets`.
+- Creado `.env.local` con las credenciales reales del proyecto (URL y anon key).
+- **Diagnóstico y corrección de errores TypeScript sistémicos** (`Property 'X' does not exist on type 'never'` en todas las tablas):
+  - Causa raíz: `@supabase/ssr@0.5.2` importaba `@supabase/supabase-js/dist/module/lib/types` que ya no existe en `supabase-js v2.108`. Adicionalmente, `supabase-js v2.108` cambió el tipo `Schema` de `any` a `never` cuando `Database` no satisface `GenericSchema`.
+  - Fix: actualizar ambos paquetes a versiones compatibles (`@supabase/ssr@^0.10.3`, `@supabase/supabase-js@^2.108.2`).
+  - Fix adicional: reescribir `src/types/database.types.ts` añadiendo `Relationships: []` (o con FK) en cada tabla — campo requerido por `postgrest-js v2.108`.
+- **Corrección de `next.config.ts`**: Next.js 14.2.15 no soporta archivos de config en TypeScript. Renombrado a `next.config.mjs` con JSDoc en lugar de `import type`.
+- **Corrección de error `logs_auditoria` insert `never[]`**: Creado helper `src/lib/supabase/audit.ts` con `insertAuditLog()` que usa tipado suelto `{ from: (table: string) => any }` para eludir el problema de inferencia del SDK. Actualizado en todos los archivos que registraban auditoría directamente.
+- `npm run build` pasa limpio con 16 rutas sin errores ni warnings de TypeScript.
+
+**Archivos modificados:**
+- `src/types/database.types.ts` — reescrito con `Relationships` explícitos en todas las tablas.
+- `src/lib/supabase/audit.ts` — nuevo helper `insertAuditLog()`.
+- `next.config.mjs` — renombrado desde `next.config.ts`, convertido a ESM con JSDoc.
+- `package.json` — `@supabase/ssr@^0.10.3`, `@supabase/supabase-js@^2.108.2`.
+- 5 archivos de Server Actions/Pages actualizados para usar `insertAuditLog()`.
+
+**Estado al cerrar sesión:** Build limpio. Integración Supabase completa. Proyecto listo para despliegue en Vercel.
 
 ---
 
