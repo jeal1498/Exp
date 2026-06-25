@@ -30,7 +30,7 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 | 4 | Módulo Clínico de Neuropsicología (Evaluaciones y Pruebas) | ✅ COMPLETADA |
 | 5 | Notas de Evolución e Inalterabilidad (Bloqueo Legal) | ✅ COMPLETADA |
 | 6 | Integraciones de Salida (Storage y Alertas por Correo) | ✅ COMPLETADA |
-| 7 | Despliegue en Vercel | ⏳ PENDIENTE |
+| 7 | Despliegue en Vercel | ✅ COMPLETADA |
 
 ---
 
@@ -90,9 +90,9 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 
 ## Estado Actual del Proyecto
 
-**Sesión activa:** Sesión 8 — Integración Supabase  
+**Sesión activa:** Sesión 9 — Despliegue en Vercel  
 **Última actualización:** 2026-06-25  
-**Próxima tarea:** Despliegue en Vercel (Sesión 9)
+**Próxima tarea:** Configurar variables de entorno en Vercel y verificar app en producción
 
 ---
 
@@ -264,30 +264,26 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 
 ---
 
-## Tarea Pendiente — Sesión 9: Despliegue en Vercel
+### Sesión 9 — 2026-06-25
+**Objetivo:** Etapa 7 — Despliegue en Vercel.  
+**Logrado:**
+- Proyecto Vercel `exp` creado (`prj_VIIstpISwfARYhhiBxwFsdIcu3jW`) en team `jeal1498s-projects`.
+- URL de producción: `https://exp-seven-gray.vercel.app` | `https://exp-jeal1498s-projects.vercel.app`
+- Creado `.vercel/project.json` para enlace permanente del repo al proyecto Vercel.
+- Modificado `.gitignore`: se excluye `.vercel/output` (build artifacts) pero se incluye `.vercel/project.json`.
+- **Acción pendiente del usuario:** En el dashboard de Vercel → Proyecto `exp` → Settings:
+  1. **Git → Production Branch** → cambiar a `main`.
+  2. **Environment Variables** → agregar:
+     - `NEXT_PUBLIC_SUPABASE_URL` = `https://mxcmfhxnjcwoueqwvzyb.supabase.co`
+     - `NEXT_PUBLIC_SUPABASE_ANON_KEY` = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14Y21maHhuamN3b3VlcXd2enliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxMjk1NDAsImV4cCI6MjA4OTcwNTU0MH0.gHuDbZPUXSE6ocz0KWPq8G5zdwEzcd4ia2N6kp1x4JU`
+     - `NEXT_PUBLIC_APP_URL` = `https://exp-jeal1498s-projects.vercel.app`
+     - `RESEND_API_KEY` = (de tu cuenta Resend — opcional)
+     - `RESEND_FROM_EMAIL` = (email verificado en Resend — opcional)
+  3. Ir a **Deployments → Redeploy** el último deploy con las nuevas vars.
 
-**Objetivo:** Conectar el repositorio `jeal1498/Exp` a Vercel y dejar la aplicación en producción.
+**Estado al cerrar sesión:** Proyecto Vercel creado. Pendiente cambio de rama de producción a `main` y configuración de env vars en dashboard para activar el build correcto de Next.js.
 
-**Pasos a seguir:**
-1. Usar las herramientas MCP de Vercel (`mcp__Vercel__*`) disponibles en la sesión.
-2. Listar proyectos existentes en Vercel para verificar si ya hay uno creado (`list_projects`).
-3. Desplegar con `deploy_to_vercel` apuntando al repo `jeal1498/Exp` rama `main`.
-4. Configurar las variables de entorno en el proyecto Vercel:
-   - `NEXT_PUBLIC_SUPABASE_URL` = `https://mxcmfhxnjcwoueqwvzyb.supabase.co`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` = (ver `.env.local` o proyecto Supabase)
-   - `SUPABASE_SERVICE_ROLE_KEY` = (obtener de Supabase → Project Settings → API)
-   - `RESEND_API_KEY` = (obtener de cuenta Resend)
-   - `RESEND_FROM_EMAIL` = (dominio verificado en Resend)
-   - `NEXT_PUBLIC_APP_URL` = URL de producción de Vercel (ej. `https://exp.vercel.app`)
-5. Verificar que el build de Vercel pase sin errores.
-6. Actualizar `NEXT_PUBLIC_APP_URL` con la URL definitiva si cambia.
-7. Actualizar este archivo con el resultado del despliegue.
-
-**Notas técnicas:**
-- El proyecto usa Next.js 14 App Router con Server Actions — compatible con Vercel sin config especial.
-- `next.config.mjs` ya tiene `serverActions.bodySizeLimit: '21mb'` para uploads de PDFs.
-- No hay `output: 'export'` — se despliega como app dinámica (SSR), no estática.
-- El archivo `next.config.ts` fue eliminado (renombrado a `.mjs`) — Vercel lo detectará correctamente.
+---
 
 ---
 

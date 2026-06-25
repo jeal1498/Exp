@@ -14,7 +14,7 @@ tsconfig.tsbuildinfo
 .env.*.local
 
 # Vercel
-.vercel
+.vercel/output
 
 # OS
 .DS_Store
