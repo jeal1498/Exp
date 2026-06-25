@@ -76,8 +76,8 @@ export default async function NuevoPacientePage({
               <span>Sexo <span className={styles.required}>*</span> <span className={styles.labelHint}>(según CURP)</span></span>
               <select name="sexo" required defaultValue="" className={styles.select}>
                 <option value="" disabled>Seleccionar…</option>
-                <option value="Masculino">Masculino (H)</option>
-                <option value="Femenino">Femenino (M)</option>
+                <option value="M">Masculino (H)</option>
+                <option value="F">Femenino (M)</option>
               </select>
             </label>
           </div>
