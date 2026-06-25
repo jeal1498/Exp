@@ -90,9 +90,9 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 
 ## Estado Actual del Proyecto
 
-**Sesión activa:** Sesión 11 — COMPLETADA  
+**Sesión activa:** Sesión 12 — COMPLETADA  
 **Última actualización:** 2026-06-25  
-**Estado:** Proyecto en producción. Login operativo sin MFA. App accesible y funcional.
+**Estado:** Proyecto en producción. Login operativo sin MFA. Skill impeccable instalada para mejoras de UI/UX.
 
 ---
 
@@ -352,6 +352,29 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 | `lalolopezxd@gmail.com` | `Hx7$kP3#mN9@wQ` | Reseteada sesión 10 — MFA pendiente de configurar |
 | `karentrujillopsic@gmail.com` | *(desconocida)* | Creada 25 mar 2026 |
 | `jeal1498@gmail.com` | *(desconocida)* | Creada 21 mar 2026 |
+
+---
+
+---
+
+### Sesión 12 — 2026-06-25
+**Objetivo:** Instalar la skill **impeccable** de diseño UI/UX en el proyecto.
+
+**Logrado:**
+- Instalada la skill `impeccable` vía `npx impeccable skills install` en `.claude/skills/impeccable/`.
+- 96 archivos instalados bajo `.claude/skills/impeccable/`:
+  - **Referencias de comandos** (`reference/`): adapt, animate, audit, bolder, brand, clarify, codex, colorize, craft, critique, delight, distill, document, extract, harden, hooks, init, interaction-design, layout, live, onboard, optimize, overdrive, polish, product, quieter, shape, typeset.
+  - **Scripts** (`scripts/`): detección de anti-patrones UI, utilidades de diseño, servidor live, integración con browser/Playwright, sistema de paletas de color.
+- Commit y push realizados en rama `claude/impeccable-style-skill-zbtqzb`.
+
+**Cómo usar la skill:**
+- `/impeccable init` — configurar el contexto de diseño del proyecto (ejecutar una vez).
+- `/impeccable audit` — detectar anti-patrones de UI en el código fuente.
+- `/impeccable polish` — pulir diseño visual de componentes.
+- `/impeccable critique` — obtener crítica de diseño detallada.
+- `npx impeccable detect src/` — análisis CLI de anti-patrones con salida JSON (útil en CI).
+
+**Estado al cerrar sesión:** Skill impeccable instalada y disponible en el proyecto.
 
 ---
 
