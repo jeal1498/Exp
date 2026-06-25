@@ -1,5 +1,7 @@
 import { signOutAction } from './actions'
 import { getUser } from '@/lib/supabase/auth'
+import { NavLinks } from './NavLinks'
+import styles from './layout.module.css'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = { title: 'Dashboard — Expedientes Clínicos' }
@@ -9,26 +11,22 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const email = session.data?.email ?? ''
 
   return (
-    <div>
-      <header>
-        <nav>
-          <strong>Expedientes Clínicos · Neuropsicología</strong>
-          <span> | </span>
-          <a href="/dashboard">Inicio</a>
-          <span> · </span>
-          <a href="/dashboard/pacientes">Pacientes</a>
-          <span> · </span>
-          <span style={{ fontSize: '0.85em', color: '#555' }}>{email}</span>
-          <span> · </span>
-          <form action={signOutAction} style={{ display: 'inline' }}>
-            <button type="submit" style={{ cursor: 'pointer' }}>
-              Cerrar sesión
-            </button>
-          </form>
-        </nav>
-        <hr />
+    <div className={styles.shell}>
+      <header className={styles.header}>
+        <div className={styles.nav}>
+          <span className={styles.wordmark}>Expedientes Clínicos · Neuropsicología</span>
+          <NavLinks />
+          <div className={styles.navMeta}>
+            <span className={styles.userEmail}>{email}</span>
+            <form action={signOutAction}>
+              <button type="submit" className={styles.signOut}>
+                Cerrar sesión
+              </button>
+            </form>
+          </div>
+        </div>
       </header>
-      <main>{children}</main>
+      <main className={styles.main}>{children}</main>
     </div>
   )
 }
