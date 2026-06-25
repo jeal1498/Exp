@@ -576,6 +576,33 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 
 ---
 
+### Sesión 17 — 2026-06-25
+**Objetivo:** Verificar que el formulario de registro de pacientes funciona end-to-end tras el fix del constraint `sexo`.
+
+**Contexto:** La sesión anterior (16) había corregido y committeado el bug del constraint `pacientes_sexo_check` (el `<select name="sexo">` enviaba `"Masculino"`/`"Femenino"` en lugar de `'M'`/`'F'`). Esta sesión verificó que el fix funciona en el formulario real mediante Playwright.
+
+**Diagnóstico durante sesión:**
+
+1. **Problema de proxy Node.js**: Las pruebas Playwright fallaban porque el Server Action necesitaba `NODE_USE_ENV_PROXY=1` para que `fetch` (undici) use el proxy HTTPS al llamar a Supabase. Resuelto reiniciando el servidor de desarrollo con la variable.
+
+2. **Root cause real del fallo**: Después de resolver el proxy, las pruebas seguían fallando. La depuración reveló que `page.click('button[type="submit"]')` clickeaba el botón **"Cerrar sesión"** del layout (`src/app/dashboard/layout.tsx`) en lugar del botón **"Registrar paciente"** del formulario de pacientes — porque el botón del header aparece primero en el DOM.
+   - El `signOutAction` en el layout es un Server Action con su propio `$ACTION_ID` que comparte el DOM con el del formulario.
+   - Al ejecutarse `signOutAction`, el usuario se desautenticaba y era redirigido a `/login`.
+   - Selector corregido: `button:text("Registrar paciente")`.
+
+**Resultado:**
+- Prueba Playwright ejecutada con éxito: login → formulario → llenado → submit → redirige a `/dashboard/pacientes`.
+- Paciente "Jose Eduardo Alvarado López" (CURP: `AALE980212HTCLPD08`) registrado correctamente en la base de datos de producción.
+- Debug logs de middleware eliminados de `src/middleware.ts`.
+- `actions.ts` restaurado a estado limpio (sin logs de debug).
+
+**Archivos modificados:**
+- `src/middleware.ts` — eliminados los `console.log([MW] ...)` de depuración que ya estaban en el commit previo (working tree ya estaba limpio al verificar).
+
+**Estado al cerrar sesión:** Formulario de registro de pacientes verificado y funcional en producción. No quedan pendientes técnicos abiertos.
+
+---
+
 ## Reglas de Sesión (No Modificar)
 
 1. Solo se ejecuta UNA etapa por sesión.
