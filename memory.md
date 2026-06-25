@@ -90,9 +90,9 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 
 ## Estado Actual del Proyecto
 
-**Sesión activa:** Sesión 14 — COMPLETADA  
+**Sesión activa:** Sesión 15 — COMPLETADA  
 **Última actualización:** 2026-06-25  
-**Estado:** Proyecto en producción. Login operativo sin MFA. Sistema de diseño completo (DESIGN.md + tokens CSS). Página de login rediseñada con impeccable craft.
+**Estado:** Proyecto en producción. Login operativo sin MFA. Sistema de diseño completo (DESIGN.md + tokens CSS). Página de login y dashboard rediseñados con impeccable craft. Dashboard responsivo para móvil, tablet y escritorio.
 
 ---
 
@@ -447,6 +447,73 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 **Archivos comprometidos:** `globals.css`, `layout.tsx`, `login.module.css`, `login/page.tsx`, `SubmitButton.tsx`.
 
 **Estado al cerrar sesión:** Página de login en producción con sistema de diseño completo. Comprometido y enviado a `claude/impeccable-init-8m5juc`, fusionado a `main`.
+
+---
+
+### Sesión 15 — 2026-06-25
+**Objetivo:** Construir panel principal del dashboard con `/impeccable craft dashboard`.
+
+**Logrado:**
+
+**Archivos creados:**
+- **`src/app/dashboard/NavLinks.tsx`** — componente cliente `'use client'` con `usePathname()`:
+  - Renderiza los links "Inicio" y "Pacientes" con `aria-current="page"` en el link activo.
+  - Aplica clase `.navLinkActive` (weight 600, ink) al link de la ruta actual.
+- **`src/app/dashboard/layout.module.css`** — CSS Module completo para el encabezado persistente:
+  - `.shell` — grid 2 filas (`auto 1fr`) que llena `100dvh`.
+  - `.header` — 48px, `background: --color-surface`, `border-bottom: 1px solid --color-border`.
+  - `.nav` — flex row con gap, padding horizontal `--space-xl`.
+  - `.wordmark` — label font, weight 600, ink, `--tracking-headline`.
+  - `.navLink` / `.navLinkActive` — muted en reposo, ink activo, transición 150ms.
+  - `.navMeta` — `margin-left: auto`, flex row con email (muted) y botón sign-out (ghost).
+  - `.signOut` — ghost button, hover → `--color-border`, focus ring.
+  - `.main` — `padding: --space-xl`.
+  - **Responsivo:** tablet (≤768px) → padding reducido; móvil (≤480px) → header en 2 filas (wordmark+sign-out arriba, navlinks abajo con `border-top`), email oculto, padding `--space-md`.
+- **`src/app/dashboard/page.module.css`** — CSS Module completo para la página dashboard:
+  - `.statsStrip` — grid 3 columnas bordeado con divisores; en ≤480px colapsa a 1 columna.
+  - `.statValue` (headline bold) / `.statLabel` (label muted) / `.statPeriod` (0.75rem muted).
+  - `.content` — grid `1fr 300px` a desktop; se apila a ≤768px.
+  - `.tableWrapper` — `overflow-x: auto` con `min-width: 480px` en la tabla interior (scroll horizontal en móvil).
+  - `.table` / `.th` / `.tr` / `.td` — tabla sin bordes en atributos HTML, totalmente estilizada con tokens.
+  - `.tr:hover .td` — fondo `--color-surface` en hover.
+  - `.expediente` — fuente mono, tracking-mono, muted.
+  - `.patientLink` — primary color, sin decoración, hover → underline.
+  - `.notesList` / `.noteItem` / `.noteHeader` / `.notePatient` / `.noteDate` / `.noteSubject` — lista compacta de notas recientes con clamp a 2 líneas.
+  - `.badge` / `.badgeLocked` (compliance amber) / `.badgeOpen` (surface + border).
+  - `.btnPrimary` / `.btnGhost` — botones full-width con todos los estados (hover, focus-visible, disabled).
+  - **Responsivo:** tablet → sidebar sube (`order: -1`), acciones en fila; móvil → acciones vuelven a columna, gap y padding reducidos.
+
+**Archivos modificados:**
+- **`src/app/dashboard/layout.tsx`** — reemplazado markup con estilos en línea por:
+  - `import NavLinks from './NavLinks'` + `import styles from './layout.module.css'`.
+  - Estructura semántica: `<div className={styles.shell}>` → `<header>` → `<div className={styles.nav}>` → `<main>`.
+  - Sin ningún estilo en línea.
+- **`src/app/dashboard/page.tsx`** — reemplazado stub completo por dashboard de producción:
+  - 5 consultas Supabase en paralelo via `Promise.all()`:
+    - `pacientes` activos (count).
+    - `notas_evolucion` del mes actual (count, filtro `gte: monthStart`).
+    - `evaluaciones_neuro` del mes actual (count).
+    - Últimos 5 pacientes (`id, numero_expediente, nombre, apellidos, created_at`).
+    - Últimas 5 notas SOAP con join a `pacientes(nombre, apellido_paterno)`, campo `is_locked`.
+  - Helper `getPaciente()` para normalizar el join (objeto o array según versión del SDK).
+  - Helper `formatFechaNota()` para fechas tipo `YYYY-MM-DD` sin desfase de zona horaria.
+  - Tipos explícitos `PacienteRow` y `NotaRow` para seguridad de tipos en el join.
+  - Renderizado:
+    - **Franja de estadísticas** — 3 celdas: pacientes activos, notas del mes, evaluaciones del mes.
+    - **Cuadrícula de contenido** (1fr 300px):
+      - Izquierda: tabla "Expedientes recientes" con No. Expediente (mono), nombre (link primary), fecha formateada.
+      - Derecha: "Acciones rápidas" (Nuevo expediente → primary, Ver todos → ghost) + "Notas recientes" (lista con nombre del paciente como link, fecha, badge NOM-004 ✓ / Abierta, subjetivo truncado 2 líneas).
+  - Estados vacíos explícitos para tabla y lista de notas.
+  - `role="region"` + `aria-labelledby` en secciones para accesibilidad.
+
+**Diseño responsivo (3 breakpoints):**
+- **≥769px (escritorio):** layout original de 2 columnas, header en una fila, padding xl.
+- **481–768px (tablet):** contenido apilado, sidebar primero (`order: -1`), acciones en fila, padding lg.
+- **≤480px (móvil):** header en 2 filas, stats en 1 columna, acciones en columna, scroll horizontal en tabla, padding md.
+
+**Build:** `npx next build` pasa limpio — 0 errores TypeScript, 16 rutas compiladas como SSR.
+
+**Ramas:** Desarrollado en `claude/impeccable-craft-dashboard-yuwd24`, fusionado a `main` y push a `origin/main`.
 
 ---
 
