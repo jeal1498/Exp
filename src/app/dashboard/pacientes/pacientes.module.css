@@ -118,7 +118,83 @@
   color: var(--color-error);
 }
 
-/* ─── Table ───────────────────────────────────────────────────────────────── */
+/* ─── Patient card list ──────────────────────────────────────────────────── */
+.patientList {
+  list-style: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  margin-bottom: var(--space-md);
+}
+
+.patientCard {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 12px var(--space-md);
+  min-height: 60px;
+  text-decoration: none;
+  color: inherit;
+  border-bottom: 1px solid var(--color-border);
+  transition: background-color var(--duration-fast) var(--ease-state);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.patientList li:last-child .patientCard {
+  border-bottom: none;
+}
+
+.patientCard:active {
+  background-color: var(--color-surface);
+}
+
+.patientCard:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+}
+
+.patientCardBody {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.patientCardName {
+  font-size: var(--text-body);
+  font-weight: var(--weight-medium);
+  color: var(--color-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.patientCardMeta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: var(--tracking-mono);
+  color: var(--color-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.patientCardMetaDot {
+  font-family: var(--font-sans);
+  color: var(--color-border);
+  flex-shrink: 0;
+}
+
+.patientCardChevron {
+  flex-shrink: 0;
+  color: var(--color-border);
+}
+
+/* ─── Table (kept for non-list contexts) ─────────────────────────────────── */
 .tableWrapper {
   width: 100%;
   overflow-x: auto;
@@ -286,7 +362,7 @@
   align-items: center;
   justify-content: center;
   padding: var(--space-sm) var(--space-md);
-  min-height: 36px;
+  min-height: 44px;
   font-family: var(--font-sans);
   font-size: var(--text-label);
   font-weight: var(--weight-medium);
@@ -299,9 +375,11 @@
   text-decoration: none;
   cursor: pointer;
   transition: background-color var(--duration-fast) var(--ease-state);
+  -webkit-tap-highlight-color: transparent;
 }
 
-.btnPrimary:hover {
+.btnPrimary:hover,
+.btnPrimary:active {
   background-color: var(--color-primary-deep);
 }
 
@@ -320,7 +398,7 @@
   align-items: center;
   justify-content: center;
   padding: var(--space-sm) var(--space-md);
-  min-height: 36px;
+  min-height: 44px;
   font-family: var(--font-sans);
   font-size: var(--text-label);
   font-weight: var(--weight-medium);
@@ -349,7 +427,7 @@
   align-items: center;
   justify-content: center;
   padding: var(--space-sm) var(--space-md);
-  min-height: 36px;
+  min-height: 44px;
   font-family: var(--font-sans);
   font-size: var(--text-label);
   font-weight: var(--weight-medium);
@@ -409,7 +487,7 @@
 
 /* ─── Forms ───────────────────────────────────────────────────────────────── */
 .form {
-  max-width: 640px;
+  /* Full-width on mobile — no desktop max-width constraint */
 }
 
 .fieldset {
@@ -464,7 +542,8 @@
 .input {
   display: block;
   width: 100%;
-  padding: var(--space-sm) 12px;
+  padding: 10px 12px;
+  min-height: 44px;
   font-family: var(--font-sans);
   font-size: var(--text-body);
   color: var(--color-ink);
@@ -485,7 +564,8 @@
 .inputMono {
   display: block;
   width: 100%;
-  padding: var(--space-sm) 12px;
+  padding: 10px 12px;
+  min-height: 44px;
   font-family: var(--font-mono);
   font-size: var(--text-body);
   color: var(--color-ink);
@@ -511,7 +591,8 @@
 .select {
   display: block;
   width: 100%;
-  padding: var(--space-sm) 32px var(--space-sm) 12px;
+  padding: 10px 32px 10px 12px;
+  min-height: 44px;
   font-family: var(--font-sans);
   font-size: var(--text-body);
   color: var(--color-ink);

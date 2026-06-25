@@ -23,36 +23,44 @@
 
 /* ─── Shell ──────────────────────────────────────────────────────────────── */
 .shell {
-  display: grid;
-  grid-template-rows: auto 1fr;
+  display: flex;
+  flex-direction: column;
   min-height: 100dvh;
+  /* Reserve space beneath fixed bottom nav + iOS safe area */
+  padding-bottom: calc(var(--nav-bottom-height) + env(safe-area-inset-bottom));
 }
 
 /* ─── Header ─────────────────────────────────────────────────────────────── */
 .header {
-  height: 48px;
+  position: sticky;
+  top: 0;
+  z-index: 30;
   background-color: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
-  display: flex;
-  align-items: center;
+  /* Notch-aware top padding */
+  padding-top: env(safe-area-inset-top);
 }
 
 .nav {
+  height: 48px;
   display: flex;
   align-items: center;
-  width: 100%;
-  padding: 0 var(--space-xl);
-  gap: var(--space-lg);
+  padding: 0 var(--space-md);
+  gap: var(--space-sm);
 }
 
 /* ─── Wordmark ───────────────────────────────────────────────────────────── */
 .wordmark {
+  flex: 1;
+  min-width: 0;
   font-size: var(--text-label);
   font-weight: var(--weight-semibold);
   color: var(--color-ink);
   letter-spacing: var(--tracking-headline);
-  white-space: nowrap;
   text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .wordmark:focus-visible {
@@ -61,51 +69,12 @@
   border-radius: var(--radius-sm);
 }
 
-/* ─── Nav links (rendered by NavLinks client component) ──────────────────── */
-.navLinks {
-  display: flex;
-  align-items: center;
-  gap: var(--space-md);
-  margin-left: var(--space-md);
-}
-
-.navLink {
-  font-size: var(--text-label);
-  font-weight: var(--weight-medium);
-  color: var(--color-muted);
-  text-decoration: none;
-  letter-spacing: var(--tracking-label);
-  padding: 2px 0;
-  transition: color var(--duration-fast) var(--ease-state);
-}
-
-.navLink:hover {
-  color: var(--color-ink);
-}
-
-.navLink:focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
-  border-radius: var(--radius-sm);
-}
-
-.navLinkActive {
-  font-weight: var(--weight-semibold);
-  color: var(--color-ink);
-}
-
-/* ─── User meta ──────────────────────────────────────────────────────────── */
+/* ─── Header actions (right side) ────────────────────────────────────────── */
 .navMeta {
-  margin-left: auto;
   display: flex;
   align-items: center;
-  gap: var(--space-md);
-}
-
-.userEmail {
-  font-size: var(--text-label);
-  color: var(--color-muted);
-  letter-spacing: var(--tracking-label);
+  gap: var(--space-xs);
+  flex-shrink: 0;
 }
 
 /* ─── Sign-out button ─────────────────────────────────────────────────────── */
@@ -116,15 +85,17 @@
   font-size: var(--text-label);
   font-weight: var(--weight-medium);
   letter-spacing: var(--tracking-label);
-  color: var(--color-ink);
+  color: var(--color-muted);
   cursor: pointer;
   padding: var(--space-xs) var(--space-sm);
   border-radius: var(--radius-sm);
-  transition: background-color var(--duration-fast) var(--ease-state);
+  min-height: 36px;
+  white-space: nowrap;
+  transition: color var(--duration-fast) var(--ease-state);
 }
 
 .signOut:hover {
-  background-color: var(--color-border);
+  color: var(--color-ink);
 }
 
 .signOut:focus-visible {
@@ -134,63 +105,65 @@
 
 /* ─── Main content area ───────────────────────────────────────────────────── */
 .main {
-  padding: var(--space-xl);
+  flex: 1;
+  padding: var(--space-md);
 }
 
-/* ─── Responsive: tablet (≤768px) ────────────────────────────────────────── */
-@media (max-width: 768px) {
-  .nav {
-    padding: 0 var(--space-lg);
-    gap: var(--space-md);
-  }
-
-  .main {
-    padding: var(--space-lg);
-  }
+/* ─── Bottom navigation bar ──────────────────────────────────────────────── */
+.bottomNav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  background-color: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  /* iOS home indicator safe area */
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
-/* ─── Responsive: mobile (≤480px) ────────────────────────────────────────── */
-@media (max-width: 480px) {
-  .header {
-    height: auto;
-  }
+/* ─── Individual tab ─────────────────────────────────────────────────────── */
+.navTab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  height: var(--nav-bottom-height);
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-muted);
+  text-decoration: none;
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-label);
+  transition: color var(--duration-fast) var(--ease-state);
+  -webkit-tap-highlight-color: transparent;
+}
 
-  .nav {
-    flex-wrap: wrap;
-    padding: var(--space-sm) var(--space-md);
-    gap: var(--space-sm);
-    row-gap: 0;
-  }
+.navTab:hover {
+  color: var(--color-ink);
+}
 
-  /* Wordmark + navMeta share the first row */
-  .wordmark {
-    flex: 1;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
+.navTabActive {
+  color: var(--color-primary);
+  font-weight: var(--weight-semibold);
+}
 
-  .navMeta {
-    margin-left: 0;
-  }
+.navTab:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+}
 
-  /* Email hidden on small screens — sign-out button stays */
-  .userEmail {
-    display: none;
-  }
-
-  /* NavLinks drop to a second row */
-  .navLinks {
-    order: 3;
-    width: 100%;
-    margin-left: 0;
-    padding: var(--space-xs) 0;
-    border-top: 1px solid var(--color-border);
-    margin-top: var(--space-xs);
-  }
-
-  .main {
-    padding: var(--space-md);
+@media (prefers-reduced-motion: reduce) {
+  .skipLink,
+  .signOut,
+  .navTab {
+    transition: none;
   }
 }

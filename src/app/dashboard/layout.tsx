@@ -18,20 +18,21 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <header className={styles.header}>
         <div className={styles.nav}>
           <a href="/dashboard" className={styles.wordmark}>
-            Expedientes Clínicos · Neuropsicología
+            Expedientes Clínicos
           </a>
-          <NavLinks />
           <div className={styles.navMeta}>
-            <span className={styles.userEmail}>{email}</span>
             <form action={signOutAction}>
               <button type="submit" className={styles.signOut}>
-                Cerrar sesión
+                Salir
               </button>
             </form>
           </div>
         </div>
       </header>
       <main id="main-content" className={styles.main}>{children}</main>
+      <nav className={styles.bottomNav} aria-label="Navegación principal">
+        <NavLinks />
+      </nav>
     </div>
   )
 }

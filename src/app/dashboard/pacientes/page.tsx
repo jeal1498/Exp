@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/server'
-import { formatFecha } from '@/lib/format'
 import styles from './pacientes.module.css'
 import type { Metadata } from 'next'
 
@@ -18,7 +17,7 @@ export default async function PacientesPage() {
       <div className={styles.pageHeader}>
         <h1 className={styles.pageTitle}>Pacientes</h1>
         <a href="/dashboard/pacientes/nuevo" className={styles.pageAction}>
-          + Registrar nuevo paciente
+          + Nuevo
         </a>
       </div>
 
@@ -36,49 +35,43 @@ export default async function PacientesPage() {
           </a>
         </p>
       ) : (
-        <div
-          className={styles.tableWrapper}
-          role="region"
-          aria-labelledby="tabla-pacientes-titulo"
-          tabIndex={0}
-        >
-          <span id="tabla-pacientes-titulo" className="sr-only">
-            Lista de pacientes
-          </span>
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th scope="col" className={styles.th}>No. Expediente</th>
-                <th scope="col" className={styles.th}>Nombre</th>
-                <th scope="col" className={styles.th}>CURP</th>
-                <th scope="col" className={styles.th}>Fecha de nacimiento</th>
-                <th scope="col" className={styles.th}>Registrado</th>
-              </tr>
-            </thead>
-            <tbody>
-              {pacientes.map((p) => (
-                <tr key={p.id} className={styles.tr}>
-                  <td className={styles.td}>
-                    <span className={styles.monoText}>{p.numero_expediente}</span>
-                  </td>
-                  <td className={styles.td}>
-                    <a
-                      href={`/dashboard/pacientes/${p.id}`}
-                      className={styles.tableLink}
-                    >
-                      {p.nombre} {p.apellido_paterno} {p.apellido_materno ?? ''}
-                    </a>
-                  </td>
-                  <td className={styles.td}>
-                    <span className={styles.monoText}>{p.curp}</span>
-                  </td>
-                  <td className={styles.td}>{formatFecha(p.fecha_nacimiento)}</td>
-                  <td className={styles.td}>{formatFecha(p.created_at)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <ul className={styles.patientList} role="list" aria-label="Lista de pacientes">
+          {pacientes.map((p) => (
+            <li key={p.id}>
+              <a
+                href={`/dashboard/pacientes/${p.id}`}
+                className={styles.patientCard}
+              >
+                <div className={styles.patientCardBody}>
+                  <span className={styles.patientCardName}>
+                    {p.nombre} {p.apellido_paterno}{p.apellido_materno ? ` ${p.apellido_materno}` : ''}
+                  </span>
+                  <span className={styles.patientCardMeta}>
+                    <span>{p.numero_expediente}</span>
+                    <span className={styles.patientCardMetaDot}>·</span>
+                    <span>{p.curp}</span>
+                  </span>
+                </div>
+                <svg
+                  className={styles.patientCardChevron}
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M6 4l4 4-4 4"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </a>
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   )

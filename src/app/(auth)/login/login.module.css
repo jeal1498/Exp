@@ -1,8 +1,4 @@
 /* ─── Page scaffold ──────────────────────────────────────────────────────── */
-/*
-  .auth-container (from layout.tsx) is the outer flex column at min-h: 100dvh.
-  .page stretches to fill it and pushes .footer to the bottom.
-*/
 .page {
   flex: 1;
   display: flex;
@@ -12,19 +8,18 @@
 .main {
   flex: 1;
   display: flex;
-  align-items: center;
+  flex-direction: column;
   justify-content: center;
-  padding: var(--space-lg);
+  padding: var(--space-lg) var(--space-md);
 }
 
 /* ─── Login container ────────────────────────────────────────────────────── */
 .container {
   width: 100%;
-  max-width: 360px;
   background-color: var(--color-bg);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  padding: var(--space-xl);
+  padding: var(--space-lg);
 
   animation: loginEnter 200ms var(--ease-state) both;
 }
@@ -49,7 +44,7 @@
 /* ─── Wordmark ───────────────────────────────────────────────────────────── */
 .header {
   margin-bottom: var(--space-lg);
-  padding-bottom: var(--space-lg);
+  padding-bottom: var(--space-md);
   border-bottom: 1px solid var(--color-border);
 }
 
@@ -113,7 +108,8 @@
 
 .input {
   width: 100%;
-  padding: var(--space-sm) var(--space-md);
+  min-height: 44px;
+  padding: 10px var(--space-md);
   font-family: var(--font-sans);
   font-size: var(--text-body);
   line-height: var(--leading-label);
@@ -140,10 +136,11 @@
 /* ─── Submit button ──────────────────────────────────────────────────────── */
 .submit {
   width: 100%;
+  min-height: 44px;
   margin-top: var(--space-xs);
-  padding: var(--space-sm) var(--space-md);
+  padding: 10px var(--space-md);
   font-family: var(--font-sans);
-  font-size: var(--text-label);
+  font-size: var(--text-body);
   font-weight: var(--weight-medium);
   letter-spacing: var(--tracking-label);
   line-height: var(--leading-label);
@@ -152,12 +149,13 @@
   border: none;
   border-radius: var(--radius-sm);
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
   transition:
     background-color var(--duration-fast) var(--ease-state),
     opacity var(--duration-fast) var(--ease-state);
 }
 
-.submit:hover:not(:disabled) {
+.submit:active:not(:disabled) {
   background-color: var(--color-primary-deep);
 }
 
@@ -173,7 +171,7 @@
 
 /* ─── Footer ─────────────────────────────────────────────────────────────── */
 .footer {
-  padding: var(--space-md) var(--space-lg);
+  padding: var(--space-md) var(--space-md);
   text-align: center;
 }
 
