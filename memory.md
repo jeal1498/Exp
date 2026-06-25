@@ -30,6 +30,7 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 | 4 | Módulo Clínico de Neuropsicología (Evaluaciones y Pruebas) | ✅ COMPLETADA |
 | 5 | Notas de Evolución e Inalterabilidad (Bloqueo Legal) | ✅ COMPLETADA |
 | 6 | Integraciones de Salida (Storage y Alertas por Correo) | ✅ COMPLETADA |
+| 7 | Despliegue en Vercel | ⏳ PENDIENTE |
 
 ---
 
@@ -91,7 +92,7 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 
 **Sesión activa:** Sesión 8 — Integración Supabase  
 **Última actualización:** 2026-06-25  
-**Próxima etapa a desbloquear:** Ninguna (proyecto completo, build limpio, listo para Vercel)
+**Próxima tarea:** Despliegue en Vercel (Sesión 9)
 
 ---
 
@@ -259,7 +260,34 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 - `package.json` — `@supabase/ssr@^0.10.3`, `@supabase/supabase-js@^2.108.2`.
 - 5 archivos de Server Actions/Pages actualizados para usar `insertAuditLog()`.
 
-**Estado al cerrar sesión:** Build limpio. Integración Supabase completa. Proyecto listo para despliegue en Vercel.
+**Estado al cerrar sesión:** Build limpio. Integración Supabase completa. **Siguiente sesión: desplegar en Vercel.**
+
+---
+
+## Tarea Pendiente — Sesión 9: Despliegue en Vercel
+
+**Objetivo:** Conectar el repositorio `jeal1498/Exp` a Vercel y dejar la aplicación en producción.
+
+**Pasos a seguir:**
+1. Usar las herramientas MCP de Vercel (`mcp__Vercel__*`) disponibles en la sesión.
+2. Listar proyectos existentes en Vercel para verificar si ya hay uno creado (`list_projects`).
+3. Desplegar con `deploy_to_vercel` apuntando al repo `jeal1498/Exp` rama `main`.
+4. Configurar las variables de entorno en el proyecto Vercel:
+   - `NEXT_PUBLIC_SUPABASE_URL` = `https://mxcmfhxnjcwoueqwvzyb.supabase.co`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` = (ver `.env.local` o proyecto Supabase)
+   - `SUPABASE_SERVICE_ROLE_KEY` = (obtener de Supabase → Project Settings → API)
+   - `RESEND_API_KEY` = (obtener de cuenta Resend)
+   - `RESEND_FROM_EMAIL` = (dominio verificado en Resend)
+   - `NEXT_PUBLIC_APP_URL` = URL de producción de Vercel (ej. `https://exp.vercel.app`)
+5. Verificar que el build de Vercel pase sin errores.
+6. Actualizar `NEXT_PUBLIC_APP_URL` con la URL definitiva si cambia.
+7. Actualizar este archivo con el resultado del despliegue.
+
+**Notas técnicas:**
+- El proyecto usa Next.js 14 App Router con Server Actions — compatible con Vercel sin config especial.
+- `next.config.mjs` ya tiene `serverActions.bodySizeLimit: '21mb'` para uploads de PDFs.
+- No hay `output: 'export'` — se despliega como app dinámica (SSR), no estática.
+- El archivo `next.config.ts` fue eliminado (renombrado a `.mjs`) — Vercel lo detectará correctamente.
 
 ---
 
