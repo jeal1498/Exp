@@ -281,7 +281,22 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
      - `RESEND_FROM_EMAIL` = (email verificado en Resend — opcional)
   3. Ir a **Deployments → Redeploy** el último deploy con las nuevas vars.
 
-**Estado al cerrar sesión:** Proyecto Vercel creado. Pendiente cambio de rama de producción a `main` y configuración de env vars en dashboard para activar el build correcto de Next.js.
+- `src/lib/resend.ts` — corregido: `new Resend()` movido a función `getResend()` para evitar crash en build sin `RESEND_API_KEY`.
+- `vercel.json` — agrega builder `@vercel/next` para forzar detección correcta de Next.js (el proyecto fue creado con `framework: null`).
+- Build final: **16 rutas compiladas correctamente**, desplegado como SSR con `lambdaRuntimeStats: nodejs:3`.
+
+**URLs de producción:**
+- https://exp-seven-gray.vercel.app
+- https://exp-jeal1498s-projects.vercel.app
+
+**Acción pendiente del usuario:** Agregar variables de entorno en Vercel Dashboard → Proyecto `exp` → Settings → Environment Variables:
+- `NEXT_PUBLIC_SUPABASE_URL` = `https://mxcmfhxnjcwoueqwvzyb.supabase.co`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14Y21maHhuamN3b3VlcXd2enliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxMjk1NDAsImV4cCI6MjA4OTcwNTU0MH0.gHuDbZPUXSE6ocz0KWPq8G5zdwEzcd4ia2N6kp1x4JU`
+- `NEXT_PUBLIC_APP_URL` = `https://exp-jeal1498s-projects.vercel.app`
+- `RESEND_API_KEY` = (opcional — de cuenta Resend)
+- `RESEND_FROM_EMAIL` = (opcional — email verificado en Resend)
+
+**Estado al cerrar sesión:** Etapa 7 COMPLETADA. App desplegada en producción en Vercel. Pendiente solo configurar env vars en dashboard para activar conexión con Supabase.
 
 ---
 
