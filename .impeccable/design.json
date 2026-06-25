@@ -1,0 +1,255 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-06-25T00:00:00Z",
+  "title": "Sistema de Diseño: Expedientes Clínicos — Neuropsicología",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Azul Verdoso Clínico",
+        "canonical": "oklch(0.440 0.092 192)",
+        "tonalRamp": [
+          "oklch(0.150 0.065 192)",
+          "oklch(0.250 0.078 192)",
+          "oklch(0.350 0.085 192)",
+          "oklch(0.440 0.092 192)",
+          "oklch(0.540 0.092 192)",
+          "oklch(0.650 0.088 192)",
+          "oklch(0.760 0.075 192)",
+          "oklch(0.920 0.030 192)"
+        ]
+      },
+      "primary-deep": {
+        "role": "primary",
+        "displayName": "Azul Verdoso Profundo",
+        "canonical": "oklch(0.350 0.085 192)",
+        "tonalRamp": []
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Tinta Clínica",
+        "canonical": "oklch(0.185 0.018 200)",
+        "tonalRamp": [
+          "oklch(0.100 0.012 200)",
+          "oklch(0.185 0.018 200)",
+          "oklch(0.300 0.018 200)",
+          "oklch(0.400 0.017 200)",
+          "oklch(0.510 0.016 200)",
+          "oklch(0.650 0.013 200)",
+          "oklch(0.800 0.010 200)",
+          "oklch(0.950 0.006 200)"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Texto Atenuado",
+        "canonical": "oklch(0.510 0.016 200)",
+        "tonalRamp": []
+      },
+      "bg": {
+        "role": "neutral",
+        "displayName": "Blanco Puro",
+        "canonical": "oklch(1.000 0.000 0)",
+        "tonalRamp": []
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Gris Estructural de Panel",
+        "canonical": "oklch(0.966 0.007 196)",
+        "tonalRamp": []
+      },
+      "border": {
+        "role": "neutral",
+        "displayName": "Borde Estructural",
+        "canonical": "oklch(0.875 0.010 195)",
+        "tonalRamp": []
+      },
+      "error": {
+        "role": "semantic",
+        "displayName": "Rojo de Alerta Clínica",
+        "canonical": "oklch(0.430 0.155 22)",
+        "tonalRamp": [
+          "oklch(0.200 0.090 22)",
+          "oklch(0.300 0.120 22)",
+          "oklch(0.430 0.155 22)",
+          "oklch(0.550 0.140 22)",
+          "oklch(0.670 0.110 22)",
+          "oklch(0.780 0.075 22)",
+          "oklch(0.880 0.040 22)",
+          "oklch(0.973 0.018 22)"
+        ]
+      },
+      "success": {
+        "role": "semantic",
+        "displayName": "Verde de Confirmación",
+        "canonical": "oklch(0.430 0.130 155)",
+        "tonalRamp": [
+          "oklch(0.200 0.075 155)",
+          "oklch(0.300 0.100 155)",
+          "oklch(0.430 0.130 155)",
+          "oklch(0.540 0.120 155)",
+          "oklch(0.650 0.100 155)",
+          "oklch(0.770 0.070 155)",
+          "oklch(0.870 0.040 155)",
+          "oklch(0.973 0.016 155)"
+        ]
+      },
+      "compliance": {
+        "role": "accent",
+        "displayName": "Ámbar de Cumplimiento",
+        "canonical": "oklch(0.560 0.095 55)",
+        "tonalRamp": [
+          "oklch(0.200 0.065 55)",
+          "oklch(0.300 0.080 55)",
+          "oklch(0.380 0.085 55)",
+          "oklch(0.480 0.090 55)",
+          "oklch(0.560 0.095 55)",
+          "oklch(0.680 0.088 55)",
+          "oklch(0.800 0.065 55)",
+          "oklch(0.970 0.022 55)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Nombre del paciente al tope del expediente. Máximo una vez por vista." },
+      "headline": { "displayName": "Headline", "purpose": "Encabezados de módulo, títulos de modal, etiquetas de navegación principal." },
+      "title": { "displayName": "Title", "purpose": "Leyendas de fieldset, encabezados de columna en tablas, secciones de barra lateral." },
+      "body": { "displayName": "Body", "purpose": "Contenido de notas SOAP, descriptores de evaluación. Máximo ~75ch por línea." },
+      "label": { "displayName": "Label", "purpose": "Etiquetas de campo, metadatos, marcas de tiempo, tabs, migas de pan." },
+      "mono": { "displayName": "Mono", "purpose": "CURP, SHA-256, códigos CIE-11, IDs de expediente. Cualquier string que deba verificarse carácter por carácter." }
+    },
+    "shadows": [
+      {
+        "name": "focus-ring",
+        "value": "0 0 0 3px oklch(0.440 0.092 192 / 0.15)",
+        "purpose": "Anillo de focus para inputs y controles interactivos en :focus-visible. No decorativo."
+      },
+      {
+        "name": "focus-ring-error",
+        "value": "0 0 0 3px oklch(0.430 0.155 22 / 0.15)",
+        "purpose": "Anillo de focus en estado de error para inputs con validación fallida."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-state",
+        "value": "cubic-bezier(0.4, 0, 0.2, 1)",
+        "duration": "150ms",
+        "purpose": "Transición por defecto para cambios de estado: hover, focus, active. Nunca para animaciones de entrada de página."
+      }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Botón Primario",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Acción principal de la vista. Guardar nota, registrar paciente, confirmar acción. Una sola instancia por formulario.",
+      "html": "<button class=\"ds-btn-primary\">Guardar nota</button>",
+      "css": ".ds-btn-primary { background: oklch(0.440 0.092 192); color: oklch(1.000 0.000 0); font-family: system-ui, sans-serif; font-size: 0.8125rem; font-weight: 500; letter-spacing: 0.01em; padding: 8px 16px; border: none; border-radius: 3px; cursor: pointer; transition: background 150ms cubic-bezier(0.4,0,0.2,1); } .ds-btn-primary:hover { background: oklch(0.350 0.085 192); } .ds-btn-primary:focus-visible { outline: 2px solid oklch(0.440 0.092 192); outline-offset: 2px; } .ds-btn-primary:active { background: oklch(0.280 0.078 192); } .ds-btn-primary:disabled { opacity: 0.45; cursor: not-allowed; }"
+    },
+    {
+      "name": "Botón Ghost",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Acciones secundarias: Cancelar, Volver, acciones destructivas no primarias.",
+      "html": "<button class=\"ds-btn-ghost\">Cancelar</button>",
+      "css": ".ds-btn-ghost { background: transparent; color: oklch(0.185 0.018 200); font-family: system-ui, sans-serif; font-size: 0.8125rem; font-weight: 500; letter-spacing: 0.01em; padding: 8px 16px; border: 1px solid oklch(0.875 0.010 195); border-radius: 3px; cursor: pointer; transition: background 150ms cubic-bezier(0.4,0,0.2,1), border-color 150ms cubic-bezier(0.4,0,0.2,1); text-decoration: none; display: inline-flex; align-items: center; } .ds-btn-ghost:hover { background: oklch(0.966 0.007 196); } .ds-btn-ghost:focus-visible { outline: 2px solid oklch(0.440 0.092 192); outline-offset: 2px; }"
+    },
+    {
+      "name": "Campo de Texto",
+      "kind": "input",
+      "refersTo": "input-default",
+      "description": "Input de texto estándar con etiqueta y texto de ayuda opcional.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-label\">Nombre(s) <abbr title=\"obligatorio\">*</abbr></span><input class=\"ds-input\" type=\"text\" placeholder=\"\" /></label>",
+      "css": ".ds-field { display: flex; flex-direction: column; gap: 4px; } .ds-label { font-family: system-ui, sans-serif; font-size: 0.8125rem; font-weight: 500; color: oklch(0.185 0.018 200); letter-spacing: 0.01em; } .ds-hint { font-family: system-ui, sans-serif; font-size: 0.8125rem; color: oklch(0.510 0.016 200); } .ds-input { background: oklch(1.000 0.000 0); color: oklch(0.185 0.018 200); font-family: system-ui, sans-serif; font-size: 1rem; line-height: 1.6; padding: 8px 12px; border: 1px solid oklch(0.875 0.010 195); border-radius: 3px; transition: border-color 150ms cubic-bezier(0.4,0,0.2,1); width: 100%; box-sizing: border-box; } .ds-input:focus { outline: none; border-color: oklch(0.440 0.092 192); box-shadow: 0 0 0 3px oklch(0.440 0.092 192 / 0.15); } .ds-input::placeholder { color: oklch(0.650 0.013 200); }"
+    },
+    {
+      "name": "Campo Monoespaciado (CURP / CIE-11)",
+      "kind": "input",
+      "refersTo": "input-default",
+      "description": "Input para identificadores que deben verificarse carácter por carácter: CURP, códigos CIE-11.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-label\">CURP <abbr title=\"obligatorio\">*</abbr></span><span class=\"ds-hint\">18 caracteres — se valida dígito verificador</span><input class=\"ds-input ds-input--mono\" type=\"text\" placeholder=\"XXXX000000XXXXXXXX0\" maxlength=\"18\" /></label>",
+      "css": ".ds-input--mono { font-family: ui-monospace, 'JetBrains Mono', 'Cascadia Code', monospace; font-size: 0.875rem; letter-spacing: 0.02em; text-transform: uppercase; }"
+    },
+    {
+      "name": "Insignia de Cumplimiento",
+      "kind": "custom",
+      "refersTo": "badge-compliance",
+      "description": "Señal normativa: NOM-004, consentimiento verificado, registro bloqueado, hash confirmado.",
+      "html": "<div style=\"display:flex;gap:8px;flex-wrap:wrap\"><span class=\"ds-badge ds-badge--compliance\">NOM-004 ✓</span><span class=\"ds-badge ds-badge--compliance\">Consentimiento verificado</span><span class=\"ds-badge ds-badge--error\">CURP inválida</span><span class=\"ds-badge ds-badge--success\">Hash SHA-256 ✓</span></div>",
+      "css": ".ds-badge { display: inline-flex; align-items: center; gap: 4px; font-family: system-ui, sans-serif; font-size: 0.8125rem; font-weight: 500; letter-spacing: 0.01em; padding: 2px 8px; border-radius: 3px; white-space: nowrap; } .ds-badge--compliance { background: oklch(0.970 0.022 55); color: oklch(0.380 0.085 55); } .ds-badge--error { background: oklch(0.973 0.018 22); color: oklch(0.430 0.155 22); } .ds-badge--success { background: oklch(0.973 0.016 155); color: oklch(0.430 0.130 155); }"
+    },
+    {
+      "name": "Navegación Principal",
+      "kind": "nav",
+      "refersTo": "button-ghost",
+      "description": "Header fijo con nombre del sistema, links de navegación y email de la usuaria.",
+      "html": "<header class=\"ds-nav\"><nav class=\"ds-nav__inner\"><strong class=\"ds-nav__brand\">Expedientes Clínicos · Neuropsicología</strong><div class=\"ds-nav__links\"><a class=\"ds-nav__link\" href=\"#\">Inicio</a><a class=\"ds-nav__link ds-nav__link--active\" href=\"#\">Pacientes</a></div><span class=\"ds-nav__user\">neuropsico@clinica.mx</span></nav></header>",
+      "css": ".ds-nav { background: oklch(0.966 0.007 196); border-bottom: 1px solid oklch(0.875 0.010 195); } .ds-nav__inner { display: flex; align-items: center; gap: 24px; padding: 0 24px; height: 48px; } .ds-nav__brand { font-family: system-ui, sans-serif; font-size: 0.8125rem; font-weight: 600; color: oklch(0.185 0.018 200); white-space: nowrap; } .ds-nav__links { display: flex; gap: 16px; flex: 1; } .ds-nav__link { font-family: system-ui, sans-serif; font-size: 0.8125rem; font-weight: 500; color: oklch(0.510 0.016 200); text-decoration: none; letter-spacing: 0.01em; transition: color 150ms cubic-bezier(0.4,0,0.2,1); } .ds-nav__link:hover { color: oklch(0.185 0.018 200); } .ds-nav__link--active { color: oklch(0.185 0.018 200); font-weight: 600; } .ds-nav__user { font-family: system-ui, sans-serif; font-size: 0.8125rem; color: oklch(0.510 0.016 200); margin-left: auto; }"
+    },
+    {
+      "name": "Tabla de Pacientes",
+      "kind": "custom",
+      "refersTo": "button-primary",
+      "description": "Lista principal de pacientes. Tabla densa con CURP en monoespaciado.",
+      "html": "<table class=\"ds-table\"><thead><tr><th class=\"ds-th\">No. Expediente</th><th class=\"ds-th\">Paciente</th><th class=\"ds-th\">CURP</th><th class=\"ds-th\">Nacimiento</th></tr></thead><tbody><tr class=\"ds-tr\"><td class=\"ds-td\"><span class=\"ds-expediente\">NRO-00042</span></td><td class=\"ds-td\"><a class=\"ds-patient-link\" href=\"#\">García López, María Elena</a></td><td class=\"ds-td ds-td--mono\">GALM850312MDFRCR07</td><td class=\"ds-td\">12/03/1985</td></tr><tr class=\"ds-tr\"><td class=\"ds-td\"><span class=\"ds-expediente\">NRO-00041</span></td><td class=\"ds-td\"><a class=\"ds-patient-link\" href=\"#\">Martínez Soto, Roberto</a></td><td class=\"ds-td ds-td--mono\">MASR780901HDFRTB02</td><td class=\"ds-td\">01/09/1978</td></tr></tbody></table>",
+      "css": ".ds-table { width: 100%; border-collapse: collapse; font-family: system-ui, sans-serif; } .ds-th { text-align: left; font-size: 0.8125rem; font-weight: 500; letter-spacing: 0.01em; color: oklch(0.510 0.016 200); padding: 8px 12px; border-bottom: 2px solid oklch(0.875 0.010 195); white-space: nowrap; } .ds-td { font-size: 0.9375rem; padding: 10px 12px; border-bottom: 1px solid oklch(0.875 0.010 195); color: oklch(0.185 0.018 200); vertical-align: middle; } .ds-td--mono { font-family: ui-monospace, 'Cascadia Code', monospace; font-size: 0.8125rem; letter-spacing: 0.02em; } .ds-tr:hover .ds-td { background: oklch(0.966 0.007 196); } .ds-patient-link { color: oklch(0.440 0.092 192); text-decoration: none; font-weight: 500; } .ds-patient-link:hover { text-decoration: underline; } .ds-expediente { color: oklch(0.510 0.016 200); font-size: 0.8125rem; font-family: ui-monospace, monospace; }"
+    },
+    {
+      "name": "Fieldset SOAP",
+      "kind": "custom",
+      "refersTo": "input-default",
+      "description": "Sección de nota SOAP. Las teclas S/O/A/P en el color primario anclan la lectura.",
+      "html": "<fieldset class=\"ds-fieldset\"><legend class=\"ds-legend\">Nota SOAP (NOM-004 §8)</legend><div class=\"ds-soap-row\"><div class=\"ds-soap-header\"><span class=\"ds-soap-key\">S</span><span class=\"ds-soap-title\">Subjetivo</span><span class=\"ds-soap-hint\">Motivo de consulta, síntomas referidos por el paciente</span></div><textarea class=\"ds-textarea\" rows=\"4\" placeholder=\"\"></textarea></div></fieldset>",
+      "css": ".ds-fieldset { border: 1px solid oklch(0.875 0.010 195); padding: 16px; margin-bottom: 16px; } .ds-legend { font-family: system-ui, sans-serif; font-size: 0.8125rem; font-weight: 600; color: oklch(0.185 0.018 200); letter-spacing: 0.01em; padding: 0 4px; } .ds-soap-row { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; } .ds-soap-header { display: flex; align-items: baseline; gap: 8px; } .ds-soap-key { font-family: ui-monospace, monospace; font-size: 1rem; font-weight: 700; color: oklch(0.440 0.092 192); width: 18px; flex-shrink: 0; } .ds-soap-title { font-family: system-ui, sans-serif; font-size: 0.8125rem; font-weight: 600; color: oklch(0.185 0.018 200); } .ds-soap-hint { font-family: system-ui, sans-serif; font-size: 0.8125rem; color: oklch(0.510 0.016 200); } .ds-textarea { font-family: system-ui, sans-serif; font-size: 1rem; line-height: 1.6; color: oklch(0.185 0.018 200); background: oklch(1.000 0.000 0); border: 1px solid oklch(0.875 0.010 195); border-radius: 3px; padding: 8px 12px; width: 100%; box-sizing: border-box; resize: vertical; transition: border-color 150ms cubic-bezier(0.4,0,0.2,1); } .ds-textarea:focus { outline: none; border-color: oklch(0.440 0.092 192); box-shadow: 0 0 0 3px oklch(0.440 0.092 192 / 0.15); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "El Instrumento de Precisión",
+    "overview": "Este sistema es un instrumento clínico, no una propuesta de producto, no una app de bienestar, no una plantilla de dashboard. Gana confianza de la misma manera que un equipo de diagnóstico bien calibrado: a través de la densidad, la consistencia y el rigor visible. Cada superficie existe para presentar datos clínicos de forma clara y rápida.\n\nLa paleta está anclada en un azul verdoso profundo — el matiz de los entornos clínicos, los instrumentos de diagnóstico y la documentación formal. Las superficies son neutras y contenidas; un único color de acento se usa con mesura y propósito. El movimiento es mínimo: solo cambios de estado.\n\nReferencias: la disciplina sistemática de Linear, la densidad informacional de Stripe, la jerarquía normativa de GOV.UK. Anti-referencia: las apps de salud para el consumidor.",
+    "keyCharacteristics": [
+      "Composiciones densas y escaneables — datos clínicos de un vistazo",
+      "Tinta fría con tinte azulado como ancla — instrumento de precisión, no propuesta de venta",
+      "Movimiento contenido — solo cambios de estado, nada decorativo",
+      "Señales de cumplimiento explícitas — auditoría, bloqueo, hashes con confianza discreta",
+      "Copia orientada al experto — sin tutoriales, sin estados vacíos de estilo consumidor"
+    ],
+    "rules": [
+      { "name": "La Regla del Acento Único", "body": "Hay un color de acento primario. Aparece en ≤10% de cualquier pantalla. Su rareza es lo que lo convierte en una señal.", "section": "colors" },
+      { "name": "La Regla Sin Calidez", "body": "La paleta es fría y neutra. Sin beiges cálidos, sin tonos ámbar en las superficies, sin pasteles asociados al bienestar.", "section": "colors" },
+      { "name": "La Regla del Estado Funcional", "body": "El rojo es para errores. El verde es para confirmaciones. El ámbar es para cumplimiento normativo. Ninguno aparece por razones estéticas.", "section": "colors" },
+      { "name": "La Regla Sin Decoración", "body": "El peso y tamaño del tipo transmiten jerarquía, no interés estético. Nunca texto en negrita por ritmo visual.", "section": "typography" },
+      { "name": "La Regla del Identificador Mono", "body": "Cualquier cadena que el usuario pudiera necesitar verificar carácter por carácter (CURP, hash SHA-256, código CIE-11) debe renderizarse en fuente monoespaciada.", "section": "typography" },
+      { "name": "La Regla de Escala Fija", "body": "Sin clamp() en los tamaños de tipo de la interfaz. La escala es fija en rem.", "section": "typography" },
+      { "name": "La Regla Plano por Defecto", "body": "Las superficies están planas en reposo. Si aparece una sombra, señala un estado interactivo activamente elevado. Las sombras nunca son tratamientos decorativos.", "section": "elevation" }
+    ],
+    "dos": [
+      "Usar la tinta fría como color dominante de texto y estructura",
+      "Mostrar señales de cumplimiento (auditoría, bloqueo, CURP, SHA-256) en el flujo principal",
+      "Usar fuente monoespaciada para CURP, hashes, códigos CIE-11, IDs de expediente",
+      "Asumir una profesional médica entrenada — copia directa, sin tutoriales",
+      "Tratar la densidad como una característica — datos escaneables de un vistazo",
+      "Respetar prefers-reduced-motion incondicionalmente",
+      "Mantener contraste WCAG 2.1 AA: ≥4.5:1 texto de cuerpo, ≥3:1 texto grande",
+      "Usar <table> para listas de pacientes — no tarjetas"
+    ],
+    "donts": [
+      "No gradientes, glow effects, hero sections, animaciones grandes ni espacio en blanco exagerado — instrumento de precisión, no propuesta de producto",
+      "No la estética cálida o ilustrada de apps de salud para el consumidor (Apple Health, Headspace)",
+      "No diluir el color de acento — si aparece en más del 10% de la pantalla, ha perdido su función",
+      "No sombras como decoración — solo para estados interactivos elevados",
+      "No ocultar señales de cumplimiento para reducir ruido visual",
+      "No estados vacíos de estilo consumidor — sin ilustraciones, sin confetti",
+      "No neutrales cálidos, fondos beige ni acentos pasteles",
+      "No tarjetas genéricas — tablas para datos tabulares, fieldsets para formularios",
+      "No fuentes display en etiquetas de UI, botones o datos"
+    ]
+  }
+}
