@@ -71,7 +71,7 @@ export async function enrollMFA(): Promise<
   // Limpiar factores sin verificar antes de inscribir uno nuevo,
   // para que reintentos del usuario no queden bloqueados.
   const { data: existingFactors } = await supabase.auth.mfa.listFactors()
-  const unverified = existingFactors?.totp?.filter((f) => f.status === 'unverified') ?? []
+  const unverified = existingFactors?.totp?.filter((f) => (f.status as string) === 'unverified') ?? []
   for (const factor of unverified) {
     await supabase.auth.mfa.unenroll({ factorId: factor.id })
   }
