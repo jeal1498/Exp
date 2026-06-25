@@ -291,6 +291,24 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 
 ---
 
+## Sesión 11 — 2026-06-25 (EN CURSO)
+
+**Objetivo:** Resolver el error de inscripción MFA que bloqueaba toda la autenticación en producción.
+
+**Causa raíz identificada:**
+1. `supabase.auth.mfa.enroll()` fallaba porque el SDK `listFactors()` no devuelve factores `unverified`, por lo que la limpieza anterior era un no-op. Los factores `unverified` de intentos fallidos previos bloqueaban nuevas inscripciones.
+2. El QR code (data URL base64 ~3-8 KB) se pasaba en un search param de URL, lo que superaba el límite de longitud de URL y haría fallar el redirect al paso de verificación.
+
+**Solución implementada:**
+- `supabase/migrations/20260625000001_clean_mfa_rpc.sql` — Función `SECURITY DEFINER` que elimina factores `unverified` directamente en `auth.mfa_factors` via RPC.
+- `src/lib/supabase/auth.ts` — `enrollMFA()` ahora llama al RPC `delete_unverified_mfa_factors()` en lugar de `listFactors()` + `unenroll()`.
+- `src/app/(auth)/enroll-mfa/actions.ts` — QR code almacenado en cookie httpOnly (10 min TTL) en lugar de pasarse en URL.
+- `src/app/(auth)/enroll-mfa/page.tsx` — Lee QR code desde cookie; si expira, muestra mensaje de error y botón de reinicio.
+
+**Pendiente:** Aplicar migración SQL en Supabase (proyecto `mxcmfhxnjcwoueqwvzyb`) y limpiar factores residuales.
+
+---
+
 ## Sesión 10 — 2026-06-25 (INCOMPLETA — punto de bloqueo)
 
 **Objetivo:** Probar el login en producción y configurar MFA para `lalolopezxd@gmail.com`.

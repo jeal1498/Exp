@@ -1,3 +1,5 @@
+import { cookies } from 'next/headers'
+import { redirect } from 'next/navigation'
 import { enrollMFAAction, verifyEnrollmentAction } from './actions'
 
 export const metadata = { title: 'Configurar Autenticación — Expedientes Clínicos' }
@@ -5,12 +7,25 @@ export const metadata = { title: 'Configurar Autenticación — Expedientes Clí
 export default async function EnrollMFAPage({
   searchParams,
 }: {
-  searchParams: Promise<{ step?: string; factorId?: string; qrCode?: string; error?: string }>
+  searchParams: Promise<{ step?: string; error?: string }>
 }) {
   const params = await searchParams
 
-  if (params.step === 'verify' && params.factorId && params.qrCode) {
-    const qrCode = decodeURIComponent(params.qrCode)
+  if (params.step === 'verify') {
+    const cookieStore = await cookies()
+    const enrollment = cookieStore.get('mfa_enrollment')
+
+    if (!enrollment) {
+      redirect(
+        `/enroll-mfa?error=${encodeURIComponent('Sesión de inscripción expirada. Inicie de nuevo.')}`,
+      )
+    }
+
+    const { factorId, qrCode } = JSON.parse(enrollment.value) as {
+      factorId: string
+      qrCode: string
+      secret: string
+    }
 
     return (
       <main>
@@ -21,8 +36,7 @@ export default async function EnrollMFAPage({
         <img src={qrCode} alt="Código QR para autenticador TOTP" width={200} height={200} />
 
         <form action={verifyEnrollmentAction}>
-          <input type="hidden" name="factorId" value={params.factorId} />
-          <input type="hidden" name="qrCode" value={params.qrCode} />
+          <input type="hidden" name="factorId" value={factorId} />
           <label>
             Código de verificación (6 dígitos)
             <br />

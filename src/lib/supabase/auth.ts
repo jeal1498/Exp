@@ -68,20 +68,17 @@ export async function enrollMFA(): Promise<
 > {
   const supabase = await createClient()
 
-  // Limpiar factores sin verificar antes de inscribir uno nuevo,
-  // para que reintentos del usuario no queden bloqueados.
-  const { data: existingFactors } = await supabase.auth.mfa.listFactors()
-  const unverified = existingFactors?.totp?.filter((f) => (f.status as string) === 'unverified') ?? []
-  for (const factor of unverified) {
-    await supabase.auth.mfa.unenroll({ factorId: factor.id })
-  }
+  // Eliminar factores 'unverified' via RPC con SECURITY DEFINER.
+  // listFactors() del SDK solo devuelve factores 'verified', por lo que la limpieza
+  // debe hacerse directamente en auth.mfa_factors con una función privilegiada.
+  await supabase.rpc('delete_unverified_mfa_factors')
 
   const { data, error } = await supabase.auth.mfa.enroll({
     factorType: 'totp',
     friendlyName: 'Autenticador Médico',
   })
 
-  if (error || !data) return { data: null, error: error ?? new Error('Error al iniciar inscripción MFA') }
+  if (error || !data) return { data: null, error: error ?? new Error('MFA enroll: no data returned') }
 
   return {
     data: {
