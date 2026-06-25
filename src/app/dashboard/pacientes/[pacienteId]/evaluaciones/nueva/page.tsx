@@ -1,26 +1,13 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { crearEvaluacion } from './actions'
+import { DOMINIOS_COGNITIVOS, PRUEBAS_COMUNES } from '@/lib/evaluaciones/constants'
 import styles from '../../../pacientes.module.css'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = { title: 'Nueva Evaluación — Expedientes Clínicos' }
 
-const DOMINIOS = [
-  'Memoria',
-  'Atencion',
-  'Funciones Ejecutivas',
-  'Lenguaje',
-  'Visuoespacial',
-  'Velocidad de Procesamiento',
-  'Habilidades Academicas',
-  'Conducta y Emocion',
-] as const
-
-const PRUEBAS_COMUNES = [
-  'WAIS-IV', 'WISC-V', 'TMT-A', 'TMT-B', 'Stroop', 'FAS',
-  'BNT', 'RAVLT', 'RBMT', 'SDMT', 'Figura de Rey', 'MMSE', 'MoCA',
-]
+const DOMINIOS = DOMINIOS_COGNITIVOS
 
 export default async function NuevaEvaluacionPage({
   params,

@@ -2,23 +2,13 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { insertAuditLog } from '@/lib/supabase/audit'
 import { formatFecha } from '@/lib/format'
+import { DOMINIOS_COGNITIVOS, DOMINIOS_LABEL } from '@/lib/evaluaciones/constants'
 import styles from '../../pacientes.module.css'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = { title: 'Evaluaciones Neuropsicológicas — Expedientes Clínicos' }
 
-const DOMINIOS_LABEL: Record<string, string> = {
-  'Memoria':                    'Mem',
-  'Atencion':                   'Aten',
-  'Funciones Ejecutivas':       'FE',
-  'Lenguaje':                   'Leng',
-  'Visuoespacial':              'Visuo',
-  'Velocidad de Procesamiento': 'VP',
-  'Habilidades Academicas':     'HabAc',
-  'Conducta y Emocion':         'CyE',
-}
-
-const DOMINIOS_ORDER = Object.keys(DOMINIOS_LABEL)
+const DOMINIOS_ORDER = [...DOMINIOS_COGNITIVOS]
 
 // Returns OKLCH values matching design tokens exactly
 function barColorVar(percentil: number): string {

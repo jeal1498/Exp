@@ -1,6 +1,9 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { insertAuditLog } from '@/lib/supabase/audit'
 import { formatFecha } from '@/lib/format'
+import { TIPO_BATERIA_LABEL, ESTADO_BATERIA_LABEL } from '@/lib/evaluaciones/constants'
+import type { TipoBateria, EstadoBateria } from '@/lib/evaluaciones/constants'
 import styles from '../pacientes.module.css'
 import type { Metadata } from 'next'
 
@@ -25,6 +28,21 @@ export default async function PacienteDetallePage({
     .eq('id', pacienteId)
     .eq('is_active', true)
     .single()
+
+  const { data: ultimasBaterias } = await supabase
+    .from('baterias_evaluacion')
+    .select('id, tipo, estado, created_at, is_locked')
+    .eq('paciente_id', pacienteId)
+    .order('created_at', { ascending: false })
+    .limit(3)
+
+  await insertAuditLog(supabase, {
+    usuario_id: userData.user.id,
+    tabla_afectada: 'pacientes',
+    registro_id: pacienteId,
+    accion: 'SELECT',
+    datos_nuevos: { vista: 'expediente' },
+  })
 
   const nombrePaciente = paciente
     ? `${paciente.nombre} ${paciente.apellido_paterno} ${paciente.apellido_materno ?? ''}`.trim()
@@ -124,10 +142,18 @@ export default async function PacienteDetallePage({
           <ul className={styles.moduleList}>
             <li className={styles.moduleItem}>
               <a
+                href={`/dashboard/pacientes/${pacienteId}/baterias`}
+                className={styles.moduleLink}
+              >
+                Baterías de Evaluación
+              </a>
+            </li>
+            <li className={styles.moduleItem}>
+              <a
                 href={`/dashboard/pacientes/${pacienteId}/evaluaciones`}
                 className={styles.moduleLink}
               >
-                Evaluaciones Neuropsicológicas
+                Evaluaciones Sueltas (legado)
               </a>
             </li>
             <li className={styles.moduleItem}>
@@ -147,6 +173,46 @@ export default async function PacienteDetallePage({
               </a>
             </li>
           </ul>
+
+          {ultimasBaterias && ultimasBaterias.length > 0 && (
+            <>
+              <h2 className={styles.sectionHeading} style={{ marginTop: '1.5rem' }}>Últimas Baterías</h2>
+              <div className={styles.tableWrapper}>
+                <table className={styles.table}>
+                  <thead>
+                    <tr>
+                      <th scope="col" className={styles.th}>Fecha</th>
+                      <th scope="col" className={styles.th}>Tipo</th>
+                      <th scope="col" className={styles.th}>Estado</th>
+                      <th scope="col" className={styles.th}>Acción</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {ultimasBaterias.map(b => (
+                      <tr key={b.id} className={styles.tr}>
+                        <td className={styles.td}>{formatFecha(b.created_at)}</td>
+                        <td className={styles.td}>{TIPO_BATERIA_LABEL[b.tipo as TipoBateria]}</td>
+                        <td className={styles.td}>
+                          {ESTADO_BATERIA_LABEL[b.estado as EstadoBateria]}
+                          {b.is_locked && <span style={{ marginLeft: '6px', fontSize: '0.75rem', color: 'oklch(0.430 0.130 155)', fontWeight: 600 }}>🔒</span>}
+                        </td>
+                        <td className={`${styles.td} ${styles.actionsCell}`}>
+                          <a href={`/dashboard/pacientes/${pacienteId}/baterias/${b.id}`} className={styles.tableLink}>Ver</a>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <a
+                href={`/dashboard/pacientes/${pacienteId}/baterias`}
+                className={styles.tableLink}
+                style={{ display: 'inline-block', marginTop: '0.5rem', fontSize: '0.85rem' }}
+              >
+                Ver todas las baterías →
+              </a>
+            </>
+          )}
 
           <a href="/dashboard/pacientes" className={styles.backLink}>
             <span aria-hidden="true">←</span>
