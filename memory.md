@@ -90,9 +90,9 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 
 ## Estado Actual del Proyecto
 
-**Sesión activa:** Sesión 12 — COMPLETADA  
+**Sesión activa:** Sesión 14 — COMPLETADA  
 **Última actualización:** 2026-06-25  
-**Estado:** Proyecto en producción. Login operativo sin MFA. Skill impeccable instalada para mejoras de UI/UX.
+**Estado:** Proyecto en producción. Login operativo sin MFA. Sistema de diseño completo (DESIGN.md + tokens CSS). Página de login rediseñada con impeccable craft.
 
 ---
 
@@ -375,6 +375,78 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 - `npx impeccable detect src/` — análisis CLI de anti-patrones con salida JSON (útil en CI).
 
 **Estado al cerrar sesión:** Skill impeccable instalada y disponible en el proyecto.
+
+---
+
+### Sesión 13 — 2026-06-25
+**Objetivo:** Crear sistema de diseño completo con `/impeccable document` (modo seed → modo scan).
+
+**Logrado:**
+- Ejecutado `/impeccable document` en modo seed (sin código): entrevista de 5 preguntas para establecer dirección visual.
+  - Estrategia de color: Restrained + cool blue tint.
+  - Tipografía: Un solo sans-serif (Inter).
+  - Movimiento: Restrained (sin animaciones de entrada vistosas).
+  - Referencias: Linear + Stripe + GOV.UK.
+  - Anti-referencia: Consumer health apps.
+- Producido `DESIGN.md` semilla con frontmatter YAML y marcador `<!-- SEED -->`.
+- Re-ejecutado `/impeccable document` (modo scan, en español) tras confirmar código existente:
+  - `palette.mjs` generó semilla: `oklch(0.720 0.100 188.0)` — teal clínico.
+  - Construido sistema completo de tokens (15 colores en OKLCH, escala tipográfica fija en rem, radios, espaciados, focus rings, motion).
+- **`DESIGN.md`** — reescrito en español completo (headers en inglés para compatibilidad de herramientas):
+  - Frontmatter YAML machine-readable con todos los tokens.
+  - 7 Reglas Nombradas: Acento Único, Sin Calidez, Estado Funcional, Sin Decoración, Identificador Mono, Escala Fija, Plano por Defecto.
+  - North Star: "El Instrumento de Precisión".
+  - Secciones: Overview, Colors, Typography, Elevation, Components, Do's and Don'ts.
+- **`.impeccable/design.json`** — sidecar schemaVersion 2:
+  - Rampas tonales de 8 pasos (primary, ink, compliance, error, success).
+  - Shadows (focus-ring, focus-ring-error).
+  - Motion tokens (ease-state, duration-fast).
+  - Breakpoints (sm/md/lg/xl).
+  - 8 componentes con HTML/CSS autocontenidos: Botón Primario/Ghost, Campo Texto/Mono, Insignias de Cumplimiento/Error/Success, Nav, Tabla de Pacientes, Fieldset SOAP.
+- **`PRODUCT.md`** — creado durante init: personalidad de marca (Preciso, Autoritario, Compuesto), anti-referencias, principios de diseño.
+
+**Estado al cerrar sesión:** Sistema de diseño completo. DESIGN.md + design.json comprometidos en rama.
+
+---
+
+### Sesión 14 — 2026-06-25
+**Objetivo:** Construir página de login con `/impeccable craft login`.
+
+**Logrado:**
+- **`src/app/globals.css`** — capa completa de tokens de diseño como CSS Custom Properties:
+  - 15 variables `--color-*` en OKLCH.
+  - Escala tipográfica `--text-*` (display → label), pesos, line-heights, letter-spacings.
+  - Radios (`--radius-sm/md`), espaciados (`--space-xs` → `--space-2xl`).
+  - Focus rings (`--focus-ring`, `--focus-ring-error`).
+  - Motion (`--ease-state`, `--duration-fast`).
+  - Reset CSS + base body + `.auth-container` (min-height: 100dvh, cool surface bg, flex column).
+- **`src/app/layout.tsx`** — modificado:
+  - Inter vía `next/font/google` (pesos 400/500/600/700, `display: 'swap'`, variable `--font-inter`).
+  - `<html lang="es" className={inter.variable}>`.
+  - `import './globals.css'`.
+- **`src/components/ui/SubmitButton.tsx`** — componente client nuevo:
+  - `'use client'` + `useFormStatus` de react-dom.
+  - `pending` → botón disabled + texto "Iniciando sesión…".
+- **`src/app/(auth)/login/login.module.css`** — módulo CSS completo:
+  - `.page` / `.main` — scaffold flex que llena `auth-container` y empuja footer al fondo.
+  - `.container` — max-width 360px, bg blanco, borde, radius-md, `@keyframes loginEnter` (200ms, opacity + translate).
+  - `@media (prefers-reduced-motion: reduce)` — animation: none.
+  - `.header` / `.wordmark` / `.subtitle` — wordmark bold ink, subtitle muted.
+  - `.errorBanner` — fondo error-bg, borde error, ícono SVG circle-X, texto label.
+  - `.input` — transición border + box-shadow, `:focus-visible` con teal border + focus-ring.
+  - `.submit` — full-width, primary bg, blanco, `:hover` → primary-deep, `:disabled` → opacity 0.65.
+- **`src/app/(auth)/login/page.tsx`** — reescrito completamente:
+  - `SubmitButton` con pending state.
+  - Error banner semántico (`role="alert"`, `aria-atomic="true"`).
+  - `autoFocus` en campo email, `autoComplete` correctos.
+  - `redirectTo` hidden input (destino post-login).
+  - Footer con NOM-004/NOM-024 usando `&#x2011;` (non-breaking hyphens).
+- Build (`npx next build`) pasó limpio — 0 errores TS, 0 warnings.
+- Inspección visual vía Playwright: desktop (1280×800), mobile (390×844), estado de error — los tres correctos.
+
+**Archivos comprometidos:** `globals.css`, `layout.tsx`, `login.module.css`, `login/page.tsx`, `SubmitButton.tsx`.
+
+**Estado al cerrar sesión:** Página de login en producción con sistema de diseño completo. Comprometido y enviado a `claude/impeccable-init-8m5juc`, fusionado a `main`.
 
 ---
 
