@@ -1,0 +1,184 @@
+/* ─── Page scaffold ──────────────────────────────────────────────────────── */
+/*
+  .auth-container (from layout.tsx) is the outer flex column at min-h: 100dvh.
+  .page stretches to fill it and pushes .footer to the bottom.
+*/
+.page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-lg);
+}
+
+/* ─── Login container ────────────────────────────────────────────────────── */
+.container {
+  width: 100%;
+  max-width: 360px;
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-xl);
+
+  animation: loginEnter 200ms var(--ease-state) both;
+}
+
+@keyframes loginEnter {
+  from {
+    opacity: 0;
+    translate: 0 8px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .container {
+    animation: none;
+  }
+}
+
+/* ─── Wordmark ───────────────────────────────────────────────────────────── */
+.header {
+  margin-bottom: var(--space-lg);
+  padding-bottom: var(--space-lg);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.wordmark {
+  display: block;
+  font-size: var(--text-title);
+  font-weight: var(--weight-bold);
+  color: var(--color-ink);
+  letter-spacing: var(--tracking-headline);
+  line-height: var(--leading-snug);
+}
+
+.subtitle {
+  display: block;
+  margin-top: 3px;
+  font-size: var(--text-label);
+  font-weight: var(--weight-regular);
+  color: var(--color-muted);
+  letter-spacing: var(--tracking-label);
+}
+
+/* ─── Form ───────────────────────────────────────────────────────────────── */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+/* ─── Error banner ───────────────────────────────────────────────────────── */
+.errorBanner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  background-color: var(--color-error-bg);
+  border: 1px solid var(--color-error);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-label);
+  color: var(--color-error);
+  line-height: var(--leading-label);
+}
+
+.errorIcon {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* ─── Field ──────────────────────────────────────────────────────────────── */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.label {
+  font-size: var(--text-label);
+  font-weight: var(--weight-medium);
+  color: var(--color-ink);
+  letter-spacing: var(--tracking-label);
+}
+
+.input {
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  line-height: var(--leading-label);
+  color: var(--color-ink);
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  appearance: none;
+  transition:
+    border-color var(--duration-fast) var(--ease-state),
+    box-shadow var(--duration-fast) var(--ease-state);
+}
+
+.input::placeholder {
+  color: var(--color-muted);
+}
+
+.input:focus-visible {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: var(--focus-ring);
+}
+
+/* ─── Submit button ──────────────────────────────────────────────────────── */
+.submit {
+  width: 100%;
+  margin-top: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+  font-family: var(--font-sans);
+  font-size: var(--text-label);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-label);
+  line-height: var(--leading-label);
+  color: oklch(1.000 0.000 0);
+  background-color: var(--color-primary);
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition:
+    background-color var(--duration-fast) var(--ease-state),
+    opacity var(--duration-fast) var(--ease-state);
+}
+
+.submit:hover:not(:disabled) {
+  background-color: var(--color-primary-deep);
+}
+
+.submit:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.submit:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* ─── Footer ─────────────────────────────────────────────────────────────── */
+.footer {
+  padding: var(--space-md) var(--space-lg);
+  text-align: center;
+}
+
+.footerText {
+  font-size: var(--text-label);
+  color: var(--color-muted);
+  letter-spacing: var(--tracking-label);
+}
