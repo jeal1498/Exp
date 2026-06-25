@@ -576,6 +576,28 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 
 ---
 
+### Sesión 18 — 2026-06-25
+**Objetivo:** Limpieza del repositorio — eliminar todas las ramas de trabajo `claude/*`.
+
+**Logrado:**
+- Identificadas 17 ramas `claude/*` obsoletas (todo su contenido ya estaba mergeado en `main`).
+- Intento de eliminación vía `git push origin --delete` desde el entorno remoto falló con 403 (token del entorno solo lectura).
+- Intento vía API GitHub REST también falló con 403 por el mismo motivo.
+- Usuario ejecutó el comando desde **Termux** (primera vez usando el repo en Termux):
+  - Instaló git con `pkg install git`.
+  - Clonó el repo con `git clone https://github.com/jeal1498/Exp.git`.
+  - Ejecutó `git push https://<token>@github.com/jeal1498/Exp.git --delete <ramas...>`.
+- 16 ramas eliminadas en la primera ejecución. La rama `claude/neuropsych-clinical-records-j80gwi` fue rechazada por ser la rama por defecto del repo.
+- Usuario cambió la rama por defecto a `main` en GitHub (`Settings → Branches`).
+- Última rama eliminada en segunda ejecución.
+- **Resultado:** El repositorio queda con una sola rama: `main`.
+
+**Nota de seguridad:** El token PAT usado fue compartido en el chat — debe ser revocado en `github.com → Settings → Developer settings → Personal access tokens`.
+
+**Estado al cerrar sesión:** Repositorio limpio. Solo existe `main`. Todo el historial de trabajo está preservado en esa rama.
+
+---
+
 ### Sesión 17 — 2026-06-25
 **Objetivo:** Verificar que el formulario de registro de pacientes funciona end-to-end tras el fix del constraint `sexo`.
 
