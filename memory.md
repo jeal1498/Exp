@@ -625,6 +625,42 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 
 ---
 
+### Sesión 19 — 2026-06-25
+**Objetivo:** Auditoría técnica completa del módulo de evaluaciones neuropsicológicas como punto de partida para su expansión.
+
+**Logrado:**
+- Revisión del estado actual del módulo de evaluaciones desde dos ángulos: funcional (qué tiene, qué le falta) y técnico (stack, schema, patrones de código).
+- Confirmado el estado real de la base de datos vía MCP Supabase (`list_tables` verbose, `execute_sql`):
+  - El proyecto Supabase `psychocore` (`mxcmfhxnjcwoueqwvzyb`) tiene **2 pacientes** y **1 evaluación** registrados en producción.
+  - El único registro en `evaluaciones_neuro` tiene todos los campos de puntaje en `null` — nunca se han capturado datos reales de puntaje.
+  - `datos_adicionales` JSONB **nunca ha sido poblado** en producción.
+  - Las migraciones SQL aplicadas no aparecen en `supabase migrations list` (tracking del CLI no configurado).
+- Producido documento técnico completo (`estado-tecnico-evaluaciones.md`) con 11 secciones:
+  1. Stack completo (Next.js 14.2.15, Supabase JS directo, sin ORM, sin Zod, sin librería de gráficas ni PDF).
+  2. DDL exacto de todas las tablas clave (`evaluaciones_neuro`, `pacientes`, `notas_evolucion`, `logs_auditoria`, `anamnesis`).
+  3. Capa de datos: Server Components + Server Actions, sin patrón repositorio, solo 2 helpers de librería.
+  4. Rutas exactas de los 4 archivos del módulo + hardcodeo de DOMINIOS/PRUEBAS en 3 lugares distintos sin fuente única.
+  5. Autenticación: Supabase Auth, MFA desactivado, modelo monousuario, RLS por `created_by`.
+  6. PDF: no instalado, Storage sí configurado (2 buckets), archivos subidos manualmente.
+  7. Frontend: formularios HTML nativos, errores vía query params, SVG inline, sin librería de gráficas.
+  8. TypeScript types: `database.types.ts` completo con `Relationships`, `dominio` tipado como `string` (no el ENUM).
+
+**Brechas identificadas para el siguiente módulo:**
+- Sin Zod — validación manual en cada Server Action.
+- Sin librería de gráficas — SVG hardcodeado, costoso para chart de perfil cognitivo (radar).
+- Sin PDF — necesita instalación de librería.
+- Dominios y pruebas duplicados en 3 archivos — falta fuente única de constantes.
+- `datos_adicionales` sin schema definido — nunca usado en producción.
+- Evaluaciones sin `is_locked`/`hash_integridad` — a diferencia de las notas SOAP.
+- Migraciones sin tracking del CLI Supabase.
+
+**Archivos modificados:**
+- `memory.md` — esta entrada.
+
+**Estado al cerrar sesión:** Auditoría técnica completa. Base de conocimiento lista para planear la expansión del módulo de evaluaciones.
+
+---
+
 ## Reglas de Sesión (No Modificar)
 
 1. Solo se ejecuta UNA etapa por sesión.
