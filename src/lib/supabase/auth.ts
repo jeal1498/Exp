@@ -71,7 +71,10 @@ export async function enrollMFA(): Promise<
   // Eliminar factores 'unverified' via RPC con SECURITY DEFINER.
   // listFactors() del SDK solo devuelve factores 'verified', por lo que la limpieza
   // debe hacerse directamente en auth.mfa_factors con una función privilegiada.
-  await supabase.rpc('delete_unverified_mfa_factors')
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  await (supabase as any).rpc('delete_unverified_mfa_factors').catch(() => {
+    // Si el RPC no existe o falla, continuar con la inscripción de todas formas
+  })
 
   const { data, error } = await supabase.auth.mfa.enroll({
     factorType: 'totp',

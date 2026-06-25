@@ -12,7 +12,7 @@ export default async function EnrollMFAPage({
   const params = await searchParams
 
   if (params.step === 'verify') {
-    const cookieStore = await cookies()
+    const cookieStore = cookies()
     const enrollment = cookieStore.get('mfa_enrollment')
 
     if (!enrollment) {
