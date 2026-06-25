@@ -291,6 +291,33 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 
 ---
 
+## Sesión 10 — 2026-06-25 (INCOMPLETA — punto de bloqueo)
+
+**Objetivo:** Probar el login en producción y configurar MFA para `lalolopezxd@gmail.com`.
+
+**Logrado:**
+- Contraseña de `lalolopezxd@gmail.com` reseteada vía SQL (`crypt` en `auth.users`).
+- Confirmado que `/login` retorna HTTP 200, `/` redirige 307, middleware protege `/dashboard` con 307.
+- Sin errores de runtime en Vercel.
+
+**Bloqueado — Error de inscripción MFA:**
+- Al pulsar "Iniciar configuración MFA", la app muestra: *"Error al iniciar inscripción MFA. Intente de nuevo."*
+- Causa identificada: `supabase.auth.mfa.enroll()` falla o deja factores en estado `unverified` que bloquean reintentos.
+- Intento de fix: antes de llamar a `enroll()`, se hace `listFactors()` y se llama `unenroll()` en los `unverified`. Pero `listFactors()` solo devuelve factores con `status: 'verified'` según el SDK, por lo que los `unverified` no se eliminan vía API.
+- Se eliminaron manualmente los factores `unverified` vía SQL dos veces, pero el error persiste tras el redeploy.
+
+**Hipótesis para investigar en sesión 11:**
+1. ¿`listFactors()` realmente devuelve factores `unverified` en runtime? Verificar con log del valor de `existingFactors`.
+2. ¿MFA está habilitado en la configuración del proyecto Supabase (`mxcmfhxnjcwoueqwvzyb`)? Verificar en Authentication → Settings → MFA.
+3. ¿El error viene del `enroll()` mismo o del redirect posterior con el QR code (URL demasiado larga)?
+4. Alternativa: usar `supabase.auth.mfa.unenroll()` pasando el `factorId` del factor existente antes de inscribir.
+
+**Archivos modificados en esta sesión:**
+- `src/lib/supabase/auth.ts` — intento de fix de limpieza de factores `unverified`.
+- `memory.md` — tabla de usuarios de producción.
+
+---
+
 ## Usuarios de Producción
 
 | Correo | Contraseña | Notas |
