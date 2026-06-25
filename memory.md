@@ -31,6 +31,7 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 | 5 | Notas de Evolución e Inalterabilidad (Bloqueo Legal) | ✅ COMPLETADA |
 | 6 | Integraciones de Salida (Storage y Alertas por Correo) | ✅ COMPLETADA |
 | 7 | Despliegue en Vercel | ✅ COMPLETADA |
+| 8 | Módulo de Baterías de Evaluación Neuropsicológica | ✅ COMPLETADA |
 
 ---
 
@@ -90,9 +91,9 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 
 ## Estado Actual del Proyecto
 
-**Sesión activa:** Sesión 20 — COMPLETADA  
+**Sesión activa:** Sesión 21 — COMPLETADA  
 **Última actualización:** 2026-06-25  
-**Estado:** Proyecto en producción. Módulo de evaluaciones con inalterabilidad NOM-004 completa (is_locked + SHA-256). Constantes centralizadas. Paginación en lista de pacientes. Build limpio, 16 rutas SSR.
+**Estado:** Proyecto en producción. Módulo de Baterías de Evaluación Neuropsicológica completo: 8 rutas, 6 formularios por instrumento, PDF con @react-pdf/renderer, firma SHA-256 NOM-004. Constantes migradas a `src/lib/evaluaciones/constants.ts`. Build limpio.
 
 ---
 
@@ -717,6 +718,74 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 - `src/app/dashboard/pacientes/pacientes.module.css`
 
 **Estado al cerrar sesión:** Todos los pendientes técnicos de Sesión 19 completados. No quedan brechas abiertas de cumplimiento normativo en el módulo de evaluaciones.
+
+---
+
+### Sesión 21 — 2026-06-25
+**Objetivo:** Implementar el Módulo de Baterías de Evaluación Neuropsicológica completo.
+
+**Logrado:**
+
+**PASO 1 — Constantes (`src/lib/evaluaciones/constants.ts`)**
+- Creado `src/lib/evaluaciones/constants.ts` en subdirectorio, reemplazando `src/lib/evaluaciones-constants.ts`.
+- Exports completos: `DOMINIOS_COGNITIVOS`, `DominioCognitivo`, `DOMINIOS_LABEL`, `TIPOS_BATERIA`, `TipoBateria`, `ESTADOS_BATERIA`, `EstadoBateria`, `INFORMANTES`, `Informante`, `INSTRUMENTOS_KAREN`, `BATERIAS_PREDEFINIDAS`, `ADOS2_PUNTOS_CORTE`, `PRUEBAS_COMUNES`.
+- Re-exporta `DOMINIOS` y `Dominio` como alias para compatibilidad con el módulo legacy `evaluaciones_neuro`.
+- 3 imports actualizados en `evaluaciones/page.tsx`, `evaluaciones/nueva/page.tsx`, `evaluaciones/nueva/actions.ts`.
+- Archivo viejo eliminado.
+
+**PASO 2 — Tipos TypeScript (`src/types/database.types.ts`)**
+- 4 tablas nuevas en `Tables`: `instrumentos_catalogo`, `baterias_evaluacion`, `evaluacion_instrumento_detalle`, `normas_conversion` con Row/Insert/Update/Relationships completos.
+- 3 ENUMs nuevos: `tipo_bateria`, `estado_bateria`, `estado_instrumento`.
+
+**PASO 3 — 8 rutas bajo `baterias/`**
+- `baterias/page.tsx` — lista de baterías con progreso (X/Y puntuados) por batería, audit SELECT NOM-024.
+- `baterias/nueva/page.tsx` — formulario radio buttons por tipo + preview de instrumentos predefinidos por tipo.
+- `baterias/nueva/actions.ts` — `crearBateria`: valida tipo, inserta batería, resuelve IDs del catálogo, inserta detalles por preset, audit INSERT.
+- `baterias/[bateriaId]/page.tsx` — vista de batería con instrumentos agrupados por test, barra de progreso SVG, botón "Generar informe" (activo solo cuando todos puntuados y no firmada).
+- `baterias/[bateriaId]/instrumentos/[detalleId]/page.tsx` — routing por `instrumento.codigo` a 6 formularios específicos.
+- `baterias/[bateriaId]/instrumentos/[detalleId]/actions.ts` — `guardarPuntajes`: validación de rangos (T-scores 20–100, escalares WISC-V 1–19, CSS ADOS-2 1–10, módulo 1–4), auto-clasificación ADOS-2, audit UPDATE.
+- `baterias/[bateriaId]/informe/page.tsx` — borrador editable / vista solo-lectura si firmado, descarga PDF con URL firmada de Storage.
+- `baterias/[bateriaId]/informe/actions.ts` — `actualizarBorrador`, `generarInforme` (PDF + upload a `reportes-escaneados`), `firmarBateria` (SHA-256 del contenido clínico + `is_locked = true`, NOM-004-SSA3-2012 Art. 9).
+
+**6 formularios de captura (`src/components/evaluaciones/`)**
+- `FormConners3.tsx` — 9 escalas clínicas + 3 de validez, nombre de informante requerido para padre/madre/maestro.
+- `FormBrief2.tsx` — 10 escalas clínicas + 4 índices (BRI/ERI/CRI/GEC) + 3 de validez.
+- `FormAdos2.tsx` — selector módulo 1–4, SA total, RRB total (módulos 1–3), total algoritmo, CSS total/SA/RRB, auto-clasificación no_tea/tea_probable/tea.
+- `FormWiscV.tsx` — 10 subpruebas (puntaje escalar 1–19) + 5 índices + FSIQ.
+- `FormCaars2.tsx` — 5 subescalas T + 2 índices DSM-5, nombre de observador requerido.
+- `FormCpt3.tsx` — 7 T-scores de output (Omisiones, Comisiones, Hit RT, Hit RT SE, Variabilidad, d', β) + nota clínica.
+
+**PASO 4 — PDF (`@react-pdf/renderer@4.5.1`)**
+- Instalado `@react-pdf/renderer`.
+- `src/lib/pdf/InformeNeuropsicologico.tsx` — template completo: encabezado con datos de la clínica, datos del paciente, motivo de consulta, instrumentos aplicados, resultados por instrumento, impresión diagnóstica, recomendaciones, bloque de firma.
+- `generarInforme` usa dynamic import para cargar el renderer solo en runtime (no rompe el build si hay errores de tipos).
+
+**PASO 5 — Expediente del paciente**
+- `src/app/dashboard/pacientes/[pacienteId]/page.tsx` — enlace "Baterías de Evaluación" agregado antes de "Evaluaciones Neuropsicológicas" en el `moduleList`.
+
+**CSS — `pacientes.module.css`**
+- Clases nuevas: `.radioLabel`, `.radioInput`, `.previewBlock`, `.previewTitle`, `.previewList`, `.previewItem`, `.previewCodigo`, `.previewNote`, `.instrumentoGroup`, `.instrumentoTitle`, `.instrumentoSubtitle`, `.progresoWrapper`, `.progresoLabel`, `.progresoBarra`, `.pageSubtitle`.
+
+**Archivos creados (25 en total):**
+- `src/lib/evaluaciones/constants.ts`
+- `src/lib/pdf/InformeNeuropsicologico.tsx`
+- `src/components/evaluaciones/Form{Conners3,Brief2,Ados2,WiscV,Caars2,Cpt3}.tsx` (6 archivos)
+- `src/app/dashboard/pacientes/[pacienteId]/baterias/page.tsx`
+- `src/app/dashboard/pacientes/[pacienteId]/baterias/nueva/{page,actions}.ts` (2)
+- `src/app/dashboard/pacientes/[pacienteId]/baterias/[bateriaId]/page.tsx`
+- `src/app/dashboard/pacientes/[pacienteId]/baterias/[bateriaId]/instrumentos/[detalleId]/{page,actions}.ts` (2)
+- `src/app/dashboard/pacientes/[pacienteId]/baterias/[bateriaId]/informe/{page,actions}.ts` (2)
+
+**Archivos eliminados:**
+- `src/lib/evaluaciones-constants.ts`
+
+**Archivos modificados:**
+- `src/types/database.types.ts`, `src/app/dashboard/pacientes/pacientes.module.css`
+- `src/app/dashboard/pacientes/[pacienteId]/page.tsx`
+- `src/app/dashboard/pacientes/[pacienteId]/evaluaciones/{page,nueva/page,nueva/actions}.ts` (3)
+- `package.json`, `package-lock.json`
+
+**Estado al cerrar sesión:** Módulo de Baterías completo. Push directo a `main`. Producción pendiente de redeploy en Vercel.
 
 ---
 
