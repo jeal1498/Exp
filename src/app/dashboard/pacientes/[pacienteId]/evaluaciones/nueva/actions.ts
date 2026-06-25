@@ -2,7 +2,7 @@
 
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { DOMINIOS } from '@/lib/evaluaciones-constants'
+import { DOMINIOS } from '@/lib/evaluaciones/constants'
 
 const DOMINIOS_VALIDOS: readonly string[] = DOMINIOS
 

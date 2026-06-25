@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { crearEvaluacion } from './actions'
-import { DOMINIOS, PRUEBAS_COMUNES } from '@/lib/evaluaciones-constants'
+import { DOMINIOS, PRUEBAS_COMUNES } from '@/lib/evaluaciones/constants'
 import styles from '../../../pacientes.module.css'
 import type { Metadata } from 'next'
 

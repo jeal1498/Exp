@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { insertAuditLog } from '@/lib/supabase/audit'
 import { formatFecha } from '@/lib/format'
-import { DOMINIOS, DOMINIOS_LABEL } from '@/lib/evaluaciones-constants'
+import { DOMINIOS, DOMINIOS_LABEL } from '@/lib/evaluaciones/constants'
 import styles from '../../pacientes.module.css'
 import type { Metadata } from 'next'
 

@@ -312,6 +312,212 @@ export interface Database {
         }
         Relationships: []
       }
+      instrumentos_catalogo: {
+        Row: {
+          id: string
+          codigo: string
+          nombre_corto: string
+          nombre_completo: string
+          tipo: 'heteroinforme' | 'observacion_directa' | 'rendimiento'
+          rango_edad_min: number
+          rango_edad_max: number
+          informantes_posibles: string[]
+          dominio_principal: string
+          activo: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          codigo?: string
+          nombre_corto?: string
+          nombre_completo?: string
+          tipo?: 'heteroinforme' | 'observacion_directa' | 'rendimiento'
+          rango_edad_min?: number
+          rango_edad_max?: number
+          informantes_posibles?: string[]
+          dominio_principal?: string
+          activo?: boolean
+        }
+        Update: {
+          id?: string
+          codigo?: string
+          nombre_corto?: string
+          nombre_completo?: string
+          tipo?: 'heteroinforme' | 'observacion_directa' | 'rendimiento'
+          rango_edad_min?: number
+          rango_edad_max?: number
+          informantes_posibles?: string[]
+          dominio_principal?: string
+          activo?: boolean
+        }
+        Relationships: []
+      }
+      baterias_evaluacion: {
+        Row: {
+          id: string
+          paciente_id: string
+          tipo: 'tdah_nino' | 'tdah_adulto' | 'tea' | 'personalizada'
+          estado: 'en_curso' | 'puntuacion_pendiente' | 'borrador_informe' | 'firmado' | 'entregado'
+          motivo_consulta: string | null
+          observaciones_generales: string | null
+          impresion_diagnostica: string | null
+          recomendaciones: string | null
+          is_locked: boolean
+          locked_at: string | null
+          hash_integridad: string | null
+          informe_storage_path: string | null
+          informe_generado_at: string | null
+          created_at: string
+          updated_at: string
+          estado_updated_at: string
+          created_by: string
+        }
+        Insert: {
+          id?: string
+          paciente_id: string
+          created_by: string
+          tipo?: 'tdah_nino' | 'tdah_adulto' | 'tea' | 'personalizada'
+          estado?: 'en_curso' | 'puntuacion_pendiente' | 'borrador_informe' | 'firmado' | 'entregado'
+          motivo_consulta?: string | null
+          observaciones_generales?: string | null
+          impresion_diagnostica?: string | null
+          recomendaciones?: string | null
+        }
+        Update: {
+          tipo?: 'tdah_nino' | 'tdah_adulto' | 'tea' | 'personalizada'
+          estado?: 'en_curso' | 'puntuacion_pendiente' | 'borrador_informe' | 'firmado' | 'entregado'
+          motivo_consulta?: string | null
+          observaciones_generales?: string | null
+          impresion_diagnostica?: string | null
+          recomendaciones?: string | null
+          is_locked?: boolean
+          locked_at?: string | null
+          hash_integridad?: string | null
+          informe_storage_path?: string | null
+          informe_generado_at?: string | null
+          estado_updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'baterias_evaluacion_paciente_id_fkey'
+            columns: ['paciente_id']
+            isOneToOne: false
+            referencedRelation: 'pacientes'
+            referencedColumns: ['id']
+          }
+        ]
+      }
+      evaluacion_instrumento_detalle: {
+        Row: {
+          id: string
+          bateria_id: string
+          instrumento_id: string
+          informante: string
+          nombre_informante: string | null
+          fecha_aplicacion: string | null
+          duracion_minutos: number | null
+          estado: 'pendiente' | 'aplicado' | 'puntuado' | 'revisado'
+          puntajes_brutos: Json | null
+          puntajes_estandar: Json | null
+          observaciones_conductuales: string | null
+          created_at: string
+          updated_at: string
+          created_by: string
+        }
+        Insert: {
+          id?: string
+          bateria_id: string
+          instrumento_id: string
+          informante: string
+          created_by: string
+          nombre_informante?: string | null
+          fecha_aplicacion?: string | null
+          duracion_minutos?: number | null
+          estado?: 'pendiente' | 'aplicado' | 'puntuado' | 'revisado'
+          puntajes_brutos?: Json | null
+          puntajes_estandar?: Json | null
+          observaciones_conductuales?: string | null
+        }
+        Update: {
+          nombre_informante?: string | null
+          fecha_aplicacion?: string | null
+          duracion_minutos?: number | null
+          estado?: 'pendiente' | 'aplicado' | 'puntuado' | 'revisado'
+          puntajes_brutos?: Json | null
+          puntajes_estandar?: Json | null
+          observaciones_conductuales?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'evaluacion_instrumento_detalle_bateria_id_fkey'
+            columns: ['bateria_id']
+            isOneToOne: false
+            referencedRelation: 'baterias_evaluacion'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'evaluacion_instrumento_detalle_instrumento_id_fkey'
+            columns: ['instrumento_id']
+            isOneToOne: false
+            referencedRelation: 'instrumentos_catalogo'
+            referencedColumns: ['id']
+          }
+        ]
+      }
+      normas_conversion: {
+        Row: {
+          id: string
+          instrumento_id: string
+          subescala: string
+          informante: string | null
+          edad_min_meses: number
+          edad_max_meses: number
+          genero: 'M' | 'F' | 'mixto' | null
+          puntaje_bruto: number
+          puntaje_escalar: number | null
+          puntaje_t: number | null
+          puntaje_indice: number | null
+          percentil: number | null
+          descripcion: string | null
+        }
+        Insert: {
+          instrumento_id: string
+          subescala: string
+          informante?: string | null
+          edad_min_meses: number
+          edad_max_meses: number
+          genero?: 'M' | 'F' | 'mixto' | null
+          puntaje_bruto: number
+          puntaje_escalar?: number | null
+          puntaje_t?: number | null
+          puntaje_indice?: number | null
+          percentil?: number | null
+          descripcion?: string | null
+        }
+        Update: {
+          instrumento_id?: string
+          subescala?: string
+          informante?: string | null
+          edad_min_meses?: number
+          edad_max_meses?: number
+          genero?: 'M' | 'F' | 'mixto' | null
+          puntaje_bruto?: number
+          puntaje_escalar?: number | null
+          puntaje_t?: number | null
+          puntaje_indice?: number | null
+          percentil?: number | null
+          descripcion?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'normas_conversion_instrumento_id_fkey'
+            columns: ['instrumento_id']
+            isOneToOne: false
+            referencedRelation: 'instrumentos_catalogo'
+            referencedColumns: ['id']
+          }
+        ]
+      }
     }
     Views: Record<string, never>
     Functions: Record<string, never>
@@ -326,6 +532,9 @@ export interface Database {
         | 'Habilidades Academicas'
         | 'Conducta y Emocion'
       accion_auditoria: 'INSERT' | 'UPDATE' | 'SELECT' | 'DELETE'
+      tipo_bateria: 'tdah_nino' | 'tdah_adulto' | 'tea' | 'personalizada'
+      estado_bateria: 'en_curso' | 'puntuacion_pendiente' | 'borrador_informe' | 'firmado' | 'entregado'
+      estado_instrumento: 'pendiente' | 'aplicado' | 'puntuado' | 'revisado'
     }
   }
 }

@@ -124,6 +124,14 @@ export default async function PacienteDetallePage({
           <ul className={styles.moduleList}>
             <li className={styles.moduleItem}>
               <a
+                href={`/dashboard/pacientes/${pacienteId}/baterias`}
+                className={styles.moduleLink}
+              >
+                Baterías de Evaluación
+              </a>
+            </li>
+            <li className={styles.moduleItem}>
+              <a
                 href={`/dashboard/pacientes/${pacienteId}/evaluaciones`}
                 className={styles.moduleLink}
               >
