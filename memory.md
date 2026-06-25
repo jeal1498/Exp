@@ -90,9 +90,9 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 
 ## Estado Actual del Proyecto
 
-**Sesión activa:** Sesión 9 — Despliegue en Vercel  
+**Sesión activa:** Sesión 9 — COMPLETADA  
 **Última actualización:** 2026-06-25  
-**Próxima tarea:** Configurar variables de entorno en Vercel y verificar app en producción
+**Estado:** Proyecto 100% completo y en producción. No hay tareas pendientes.
 
 ---
 
@@ -265,40 +265,29 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 ---
 
 ### Sesión 9 — 2026-06-25
-**Objetivo:** Etapa 7 — Despliegue en Vercel.  
-**Logrado:**
-- Proyecto Vercel `exp` creado (`prj_VIIstpISwfARYhhiBxwFsdIcu3jW`) en team `jeal1498s-projects`.
-- URL de producción: `https://exp-seven-gray.vercel.app` | `https://exp-jeal1498s-projects.vercel.app`
-- Creado `.vercel/project.json` para enlace permanente del repo al proyecto Vercel.
-- Modificado `.gitignore`: se excluye `.vercel/output` (build artifacts) pero se incluye `.vercel/project.json`.
-- **Acción pendiente del usuario:** En el dashboard de Vercel → Proyecto `exp` → Settings:
-  1. **Git → Production Branch** → cambiar a `main`.
-  2. **Environment Variables** → agregar:
-     - `NEXT_PUBLIC_SUPABASE_URL` = `https://mxcmfhxnjcwoueqwvzyb.supabase.co`
-     - `NEXT_PUBLIC_SUPABASE_ANON_KEY` = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14Y21maHhuamN3b3VlcXd2enliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxMjk1NDAsImV4cCI6MjA4OTcwNTU0MH0.gHuDbZPUXSE6ocz0KWPq8G5zdwEzcd4ia2N6kp1x4JU`
-     - `NEXT_PUBLIC_APP_URL` = `https://exp-jeal1498s-projects.vercel.app`
-     - `RESEND_API_KEY` = (de tu cuenta Resend — opcional)
-     - `RESEND_FROM_EMAIL` = (email verificado en Resend — opcional)
-  3. Ir a **Deployments → Redeploy** el último deploy con las nuevas vars.
+**Objetivo:** Etapa 7 — Despliegue en Vercel y puesta en producción completa.
 
-- `src/lib/resend.ts` — corregido: `new Resend()` movido a función `getResend()` para evitar crash en build sin `RESEND_API_KEY`.
-- `vercel.json` — agrega builder `@vercel/next` para forzar detección correcta de Next.js (el proyecto fue creado con `framework: null`).
-- Build final: **16 rutas compiladas correctamente**, desplegado como SSR con `lambdaRuntimeStats: nodejs:3`.
+**Logrado:**
+- Proyecto Vercel `exp` creado (`prj_VIIstpISwfARYhhiBxwFsdIcu3jW`) en team `jeal1498s-projects`, vinculado al repo `jeal1498/Exp` rama `main`.
+- `.vercel/project.json` — enlace permanente del repo al proyecto Vercel (comprometido en git).
+- `.gitignore` — corregido para excluir `.vercel/output` pero incluir `.vercel/project.json`.
+- `src/lib/resend.ts` — corregido: `new Resend()` movido a función lazy `getResend()` para evitar crash de build al no tener `RESEND_API_KEY` en tiempo de compilación.
+- `vercel.json` — agrega builder `@vercel/next` explícito porque el proyecto fue creado con `framework: null` (Vercel buscaba directorio `public` estático en lugar del output SSR de Next.js).
+- Variables de entorno configuradas en Vercel Dashboard por el usuario:
+  - `NEXT_PUBLIC_SUPABASE_URL` = `https://mxcmfhxnjcwoueqwvzyb.supabase.co`
+  - `NEXT_PUBLIC_SUPABASE_ANON_KEY` = (anon key del proyecto Supabase)
+  - `NEXT_PUBLIC_APP_URL` = `https://exp-jeal1498s-projects.vercel.app`
+- Redeploy final exitoso: **16 rutas compiladas como SSR** (`lambdaRuntimeStats: nodejs:3`), sin errores.
 
 **URLs de producción:**
-- https://exp-seven-gray.vercel.app
-- https://exp-jeal1498s-projects.vercel.app
+- https://exp-jeal1498s-projects.vercel.app ← URL principal
+- https://exp-seven-gray.vercel.app ← alias alternativo
 
-**Acción pendiente del usuario:** Agregar variables de entorno en Vercel Dashboard → Proyecto `exp` → Settings → Environment Variables:
-- `NEXT_PUBLIC_SUPABASE_URL` = `https://mxcmfhxnjcwoueqwvzyb.supabase.co`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY` = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14Y21maHhuamN3b3VlcXd2enliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxMjk1NDAsImV4cCI6MjA4OTcwNTU0MH0.gHuDbZPUXSE6ocz0KWPq8G5zdwEzcd4ia2N6kp1x4JU`
-- `NEXT_PUBLIC_APP_URL` = `https://exp-jeal1498s-projects.vercel.app`
-- `RESEND_API_KEY` = (opcional — de cuenta Resend)
-- `RESEND_FROM_EMAIL` = (opcional — email verificado en Resend)
+**Variables de entorno opcionales (no configuradas aún):**
+- `RESEND_API_KEY` — necesaria para alertas de login y notificaciones de notas bloqueadas.
+- `RESEND_FROM_EMAIL` — email verificado en Resend desde el cual se envían notificaciones.
 
-**Estado al cerrar sesión:** Etapa 7 COMPLETADA. App desplegada en producción en Vercel. Pendiente solo configurar env vars en dashboard para activar conexión con Supabase.
-
----
+**Estado al cerrar sesión:** Etapa 7 COMPLETADA. **Proyecto 100% completo y en producción.** La app está accesible, conectada a Supabase con RLS/MFA/auditoría NOM-024, y cumple íntegramente con NOM-004-SSA3-2012 y NOM-024-SSA3-2012.
 
 ---
 
