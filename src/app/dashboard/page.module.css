@@ -142,7 +142,6 @@
 .tableWrapper {
   width: 100%;
   overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
 }
@@ -231,7 +230,7 @@
   font-weight: var(--weight-medium);
   letter-spacing: var(--tracking-label);
   line-height: var(--leading-label);
-  color: oklch(1.000 0.000 0);
+  color: oklch(1.000 0.000 0); /* white text on primary bg — intentional */
   background-color: var(--color-primary);
   border: none;
   border-radius: var(--radius-sm);

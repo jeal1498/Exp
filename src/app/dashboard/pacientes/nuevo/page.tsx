@@ -1,4 +1,5 @@
 import { crearPaciente } from './actions'
+import styles from '../pacientes.module.css'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = { title: 'Nuevo Paciente — Expedientes Clínicos' }
@@ -27,58 +28,53 @@ export default async function NuevoPacientePage({
 
   return (
     <div>
-      <h1>Registrar Nuevo Paciente</h1>
-      <p style={{ fontSize: '0.85em', color: '#555' }}>
-        Campos marcados con <abbr title="obligatorio">*</abbr> son requeridos por NOM-004-SSA3-2012.
+      <h1 className={styles.pageTitle}>Registrar Nuevo Paciente</h1>
+      <p className={styles.helperText}>
+        Campos marcados con <abbr title="obligatorio"><span className={styles.required}>*</span></abbr> son requeridos por NOM-004-SSA3-2012.
       </p>
 
       {params.error && (
-        <p role="alert" style={{ color: 'red', border: '1px solid red', padding: '8px' }}>
+        <p role="alert" className={styles.alert}>
           {decodeURIComponent(params.error)}
         </p>
       )}
 
-      <form action={crearPaciente}>
-        <fieldset>
+      <form action={crearPaciente} className={styles.form}>
+        <fieldset className={styles.fieldset}>
           <legend>Datos de identificación</legend>
 
-          <div>
-            <label>
-              Nombre(s) *
-              <br />
-              <input type="text" name="nombre" required maxLength={100} />
+          <div className={styles.fieldGroup}>
+            <label className={styles.label}>
+              <span>Nombre(s) <span className={styles.required}>*</span></span>
+              <input type="text" name="nombre" required maxLength={100} className={styles.input} />
             </label>
           </div>
 
-          <div>
-            <label>
-              Apellido paterno *
-              <br />
-              <input type="text" name="apellido_paterno" required maxLength={100} />
+          <div className={styles.fieldGroup}>
+            <label className={styles.label}>
+              <span>Apellido paterno <span className={styles.required}>*</span></span>
+              <input type="text" name="apellido_paterno" required maxLength={100} className={styles.input} />
             </label>
           </div>
 
-          <div>
-            <label>
-              Apellido materno
-              <br />
-              <input type="text" name="apellido_materno" maxLength={100} />
+          <div className={styles.fieldGroup}>
+            <label className={styles.label}>
+              <span>Apellido materno</span>
+              <input type="text" name="apellido_materno" maxLength={100} className={styles.input} />
             </label>
           </div>
 
-          <div>
-            <label>
-              Fecha de nacimiento *
-              <br />
-              <input type="date" name="fecha_nacimiento" required />
+          <div className={styles.fieldGroup}>
+            <label className={styles.label}>
+              <span>Fecha de nacimiento <span className={styles.required}>*</span></span>
+              <input type="date" name="fecha_nacimiento" required className={styles.input} />
             </label>
           </div>
 
-          <div>
-            <label>
-              Sexo * <span style={{ fontSize: '0.8em' }}>(según CURP)</span>
-              <br />
-              <select name="sexo" required defaultValue="">
+          <div className={styles.fieldGroup}>
+            <label className={styles.label}>
+              <span>Sexo <span className={styles.required}>*</span> <span className={styles.labelHint}>(según CURP)</span></span>
+              <select name="sexo" required defaultValue="" className={styles.select}>
                 <option value="" disabled>Seleccionar…</option>
                 <option value="Masculino">Masculino (H)</option>
                 <option value="Femenino">Femenino (M)</option>
@@ -86,10 +82,9 @@ export default async function NuevoPacientePage({
             </label>
           </div>
 
-          <div>
-            <label>
-              CURP * <span style={{ fontSize: '0.8em' }}>(18 caracteres — se valida dígito verificador)</span>
-              <br />
+          <div className={styles.fieldGroup}>
+            <label className={styles.label}>
+              <span>CURP <span className={styles.required}>*</span> <span className={styles.labelHint}>(18 caracteres — se valida dígito verificador)</span></span>
               <input
                 type="text"
                 name="curp"
@@ -97,21 +92,20 @@ export default async function NuevoPacientePage({
                 minLength={18}
                 maxLength={18}
                 pattern="[A-Za-z0-9]{18}"
-                style={{ textTransform: 'uppercase', fontFamily: 'monospace' }}
+                className={styles.inputMono}
                 placeholder="XXXX000000XXXXXXXX0"
               />
             </label>
           </div>
         </fieldset>
 
-        <fieldset>
+        <fieldset className={styles.fieldset}>
           <legend>Datos neuropsicológicos (NOM-004)</legend>
 
-          <div>
-            <label>
-              Lateralidad *
-              <br />
-              <select name="lateralidad" required defaultValue="">
+          <div className={styles.fieldGroup}>
+            <label className={styles.label}>
+              <span>Lateralidad <span className={styles.required}>*</span></span>
+              <select name="lateralidad" required defaultValue="" className={styles.select}>
                 <option value="" disabled>Seleccionar…</option>
                 <option value="Diestro">Diestro</option>
                 <option value="Zurdo">Zurdo</option>
@@ -120,11 +114,10 @@ export default async function NuevoPacientePage({
             </label>
           </div>
 
-          <div>
-            <label>
-              Escolaridad *
-              <br />
-              <select name="escolaridad" required defaultValue="">
+          <div className={styles.fieldGroup}>
+            <label className={styles.label}>
+              <span>Escolaridad <span className={styles.required}>*</span></span>
+              <select name="escolaridad" required defaultValue="" className={styles.select}>
                 <option value="" disabled>Seleccionar…</option>
                 {ESCOLARIDADES.map((e) => (
                   <option key={e} value={e}>
@@ -136,70 +129,65 @@ export default async function NuevoPacientePage({
           </div>
         </fieldset>
 
-        <fieldset>
+        <fieldset className={styles.fieldset}>
           <legend>Datos de contacto</legend>
 
-          <div>
-            <label>
-              Ocupación
-              <br />
-              <input type="text" name="ocupacion" maxLength={100} />
+          <div className={styles.fieldGroup}>
+            <label className={styles.label}>
+              <span>Ocupación</span>
+              <input type="text" name="ocupacion" maxLength={100} className={styles.input} />
             </label>
           </div>
 
-          <div>
-            <label>
-              Domicilio
-              <br />
-              <input type="text" name="domicilio" maxLength={255} />
+          <div className={styles.fieldGroup}>
+            <label className={styles.label}>
+              <span>Domicilio</span>
+              <input type="text" name="domicilio" maxLength={255} className={styles.input} />
             </label>
           </div>
 
-          <div>
-            <label>
-              Teléfono
-              <br />
-              <input type="tel" name="telefono" maxLength={20} />
+          <div className={styles.fieldGroup}>
+            <label className={styles.label}>
+              <span>Teléfono</span>
+              <input type="tel" name="telefono" maxLength={20} className={styles.input} />
             </label>
           </div>
 
-          <div>
-            <label>
-              Correo electrónico
-              <br />
-              <input type="email" name="email" maxLength={150} />
+          <div className={styles.fieldGroup}>
+            <label className={styles.label}>
+              <span>Correo electrónico</span>
+              <input type="email" name="email" maxLength={150} className={styles.input} />
             </label>
           </div>
         </fieldset>
 
-        <fieldset>
+        <fieldset className={styles.fieldset}>
           <legend>Motivo de consulta</legend>
 
-          <div>
-            <label>
-              Motivo de consulta
-              <br />
-              <textarea name="motivo_consulta" rows={4} cols={60} maxLength={1000} />
+          <div className={styles.fieldGroup}>
+            <label className={styles.label}>
+              <span>Motivo de consulta</span>
+              <textarea name="motivo_consulta" rows={4} maxLength={1000} className={styles.textarea} />
             </label>
           </div>
         </fieldset>
 
-        <fieldset>
+        <fieldset className={styles.fieldset}>
           <legend>Consentimiento informado (NOM-004 §7.1)</legend>
 
-          <label>
+          <label className={styles.checkboxLabel}>
             <input type="checkbox" name="consentimiento_informado" required />
-            {' '}
-            El paciente o tutor ha otorgado consentimiento informado por escrito para el
-            tratamiento de sus datos clínicos y la realización de evaluaciones
-            neuropsicológicas, conforme al Art. 7 de la NOM-004-SSA3-2012. *
+            <span>
+              El paciente o tutor ha otorgado consentimiento informado por escrito para el
+              tratamiento de sus datos clínicos y la realización de evaluaciones
+              neuropsicológicas, conforme al Art. 7 de la NOM-004-SSA3-2012. <span className={styles.required}>*</span>
+            </span>
           </label>
         </fieldset>
 
-        <div style={{ marginTop: '16px' }}>
-          <button type="submit">Registrar paciente</button>
-          <span> · </span>
-          <a href="/dashboard/pacientes">Cancelar</a>
+        <div className={styles.formActions}>
+          <button type="submit" className={styles.btnPrimary}>Registrar paciente</button>
+          <a href="/dashboard/pacientes" className={styles.btnGhost}>Cancelar</a>
         </div>
       </form>
     </div>

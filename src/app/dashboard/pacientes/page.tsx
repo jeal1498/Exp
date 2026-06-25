@@ -1,4 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
+import { formatFecha } from '@/lib/format'
+import styles from './pacientes.module.css'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = { title: 'Pacientes — Expedientes Clínicos' }
@@ -13,48 +15,70 @@ export default async function PacientesPage() {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1>Pacientes</h1>
-        <a href="/dashboard/pacientes/nuevo">+ Registrar nuevo paciente</a>
+      <div className={styles.pageHeader}>
+        <h1 className={styles.pageTitle}>Pacientes</h1>
+        <a href="/dashboard/pacientes/nuevo" className={styles.pageAction}>
+          + Registrar nuevo paciente
+        </a>
       </div>
 
       {error && (
-        <p role="alert" style={{ color: 'red' }}>
+        <p role="alert" className={styles.alert}>
           Error al cargar pacientes: {error.message}
         </p>
       )}
 
       {!pacientes || pacientes.length === 0 ? (
-        <p>No hay pacientes registrados. <a href="/dashboard/pacientes/nuevo">Registra el primero.</a></p>
+        <p className={styles.empty}>
+          No hay pacientes registrados.{' '}
+          <a href="/dashboard/pacientes/nuevo" className={styles.tableLink}>
+            Registra el primero.
+          </a>
+        </p>
       ) : (
-        <table border={1} cellPadding={8} style={{ borderCollapse: 'collapse', width: '100%' }}>
-          <thead>
-            <tr>
-              <th>No. Expediente</th>
-              <th>Nombre</th>
-              <th>CURP</th>
-              <th>Fecha de nacimiento</th>
-              <th>Registrado</th>
-            </tr>
-          </thead>
-          <tbody>
-            {pacientes.map((p) => (
-              <tr key={p.id}>
-                <td>{p.numero_expediente}</td>
-                <td>
-                  <a href={`/dashboard/pacientes/${p.id}`}>
-                    {p.nombre} {p.apellido_paterno} {p.apellido_materno ?? ''}
-                  </a>
-                </td>
-                <td>
-                  <code>{p.curp}</code>
-                </td>
-                <td>{p.fecha_nacimiento}</td>
-                <td>{new Date(p.created_at).toLocaleDateString('es-MX')}</td>
+        <div
+          className={styles.tableWrapper}
+          role="region"
+          aria-labelledby="tabla-pacientes-titulo"
+          tabIndex={0}
+        >
+          <span id="tabla-pacientes-titulo" className="sr-only">
+            Lista de pacientes
+          </span>
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th scope="col" className={styles.th}>No. Expediente</th>
+                <th scope="col" className={styles.th}>Nombre</th>
+                <th scope="col" className={styles.th}>CURP</th>
+                <th scope="col" className={styles.th}>Fecha de nacimiento</th>
+                <th scope="col" className={styles.th}>Registrado</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {pacientes.map((p) => (
+                <tr key={p.id} className={styles.tr}>
+                  <td className={styles.td}>
+                    <span className={styles.monoText}>{p.numero_expediente}</span>
+                  </td>
+                  <td className={styles.td}>
+                    <a
+                      href={`/dashboard/pacientes/${p.id}`}
+                      className={styles.tableLink}
+                    >
+                      {p.nombre} {p.apellido_paterno} {p.apellido_materno ?? ''}
+                    </a>
+                  </td>
+                  <td className={styles.td}>
+                    <span className={styles.monoText}>{p.curp}</span>
+                  </td>
+                  <td className={styles.td}>{formatFecha(p.fecha_nacimiento)}</td>
+                  <td className={styles.td}>{formatFecha(p.created_at)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   )

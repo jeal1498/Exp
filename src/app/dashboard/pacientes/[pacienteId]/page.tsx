@@ -1,5 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { formatFecha } from '@/lib/format'
+import styles from '../pacientes.module.css'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = { title: 'Expediente — Expedientes Clínicos' }
@@ -24,109 +26,132 @@ export default async function PacienteDetallePage({
     .eq('is_active', true)
     .single()
 
+  const nombrePaciente = paciente
+    ? `${paciente.nombre} ${paciente.apellido_paterno} ${paciente.apellido_materno ?? ''}`.trim()
+    : 'Expediente'
+
   return (
     <div>
-      <p style={{ fontSize: '0.85em', color: '#555' }}>
-        <a href="/dashboard/pacientes">Pacientes</a>
-        {' › '}
-        {paciente ? `${paciente.nombre} ${paciente.apellido_paterno}` : 'Expediente'}
-      </p>
+      <nav aria-label="Migas de pan" className={styles.breadcrumb}>
+        <ol className={styles.breadcrumbList}>
+          <li className={styles.breadcrumbItem}>
+            <a href="/dashboard/pacientes">Pacientes</a>
+          </li>
+          <li className={styles.breadcrumbItem} aria-hidden="true">
+            <span className={styles.breadcrumbSep}>›</span>
+          </li>
+          <li className={styles.breadcrumbItem} aria-current="page">
+            {nombrePaciente}
+          </li>
+        </ol>
+      </nav>
 
       {(error || !paciente) && (
-        <p role="alert" style={{ color: 'red', border: '1px solid red', padding: '8px' }}>
+        <p role="alert" className={styles.alert}>
           Paciente no encontrado o sin acceso.
         </p>
       )}
 
       {paciente && (
         <>
-          <h1>
-            Expediente: {paciente.nombre} {paciente.apellido_paterno}{' '}
-            {paciente.apellido_materno ?? ''}
-          </h1>
+          <h1 className={styles.pageTitle}>{nombrePaciente}</h1>
 
-          <dl style={{ lineHeight: '1.8' }}>
-            <dt><strong>No. Expediente</strong></dt>
-            <dd>{paciente.numero_expediente}</dd>
+          <dl className={styles.metaList}>
+            <dt className={styles.metaLabel}>No. Expediente</dt>
+            <dd className={`${styles.metaValue} ${styles.metaValueMono}`}>
+              {paciente.numero_expediente}
+            </dd>
 
-            <dt><strong>CURP</strong></dt>
-            <dd><code>{paciente.curp}</code></dd>
+            <dt className={styles.metaLabel}>CURP</dt>
+            <dd className={`${styles.metaValue} ${styles.metaValueMono}`}>
+              {paciente.curp}
+            </dd>
 
-            <dt><strong>Fecha de nacimiento</strong></dt>
-            <dd>{paciente.fecha_nacimiento}</dd>
+            <dt className={styles.metaLabel}>Fecha de nacimiento</dt>
+            <dd className={styles.metaValue}>{formatFecha(paciente.fecha_nacimiento)}</dd>
 
-            <dt><strong>Sexo</strong></dt>
-            <dd>{paciente.sexo}</dd>
+            <dt className={styles.metaLabel}>Sexo</dt>
+            <dd className={styles.metaValue}>{paciente.sexo}</dd>
 
-            <dt><strong>Lateralidad</strong></dt>
-            <dd>{paciente.lateralidad ?? '—'}</dd>
+            <dt className={styles.metaLabel}>Lateralidad</dt>
+            <dd className={styles.metaValue}>{paciente.lateralidad ?? '—'}</dd>
 
-            <dt><strong>Escolaridad</strong></dt>
-            <dd>{paciente.escolaridad ?? '—'}</dd>
+            <dt className={styles.metaLabel}>Escolaridad</dt>
+            <dd className={styles.metaValue}>{paciente.escolaridad ?? '—'}</dd>
 
             {paciente.ocupacion && (
               <>
-                <dt><strong>Ocupación</strong></dt>
-                <dd>{paciente.ocupacion}</dd>
+                <dt className={styles.metaLabel}>Ocupación</dt>
+                <dd className={styles.metaValue}>{paciente.ocupacion}</dd>
               </>
             )}
 
             {paciente.telefono && (
               <>
-                <dt><strong>Teléfono</strong></dt>
-                <dd>{paciente.telefono}</dd>
+                <dt className={styles.metaLabel}>Teléfono</dt>
+                <dd className={styles.metaValue}>{paciente.telefono}</dd>
               </>
             )}
 
             {paciente.email && (
               <>
-                <dt><strong>Correo</strong></dt>
-                <dd>{paciente.email}</dd>
+                <dt className={styles.metaLabel}>Correo</dt>
+                <dd className={styles.metaValue}>{paciente.email}</dd>
               </>
             )}
 
             {paciente.motivo_consulta && (
               <>
-                <dt><strong>Motivo de consulta</strong></dt>
-                <dd>{paciente.motivo_consulta}</dd>
+                <dt className={styles.metaLabel}>Motivo de consulta</dt>
+                <dd className={styles.metaValue}>{paciente.motivo_consulta}</dd>
               </>
             )}
 
-            <dt><strong>Consentimiento informado</strong></dt>
-            <dd>
+            <dt className={styles.metaLabel}>Consentimiento informado</dt>
+            <dd className={styles.metaValue}>
               {paciente.consentimiento_informado
                 ? `Sí — ${paciente.consentimiento_fecha ?? ''}`
                 : 'No registrado'}
             </dd>
 
-            <dt><strong>Registrado</strong></dt>
-            <dd>{new Date(paciente.created_at).toLocaleDateString('es-MX')}</dd>
+            <dt className={styles.metaLabel}>Registrado</dt>
+            <dd className={styles.metaValue}>{formatFecha(paciente.created_at)}</dd>
           </dl>
 
-          <hr />
+          <hr className={styles.divider} />
 
-          <h2>Módulos del expediente</h2>
-          <ul>
-            <li>
-              <a href={`/dashboard/pacientes/${pacienteId}/evaluaciones`}>
+          <h2 className={styles.sectionHeading}>Módulos del expediente</h2>
+          <ul className={styles.moduleList}>
+            <li className={styles.moduleItem}>
+              <a
+                href={`/dashboard/pacientes/${pacienteId}/evaluaciones`}
+                className={styles.moduleLink}
+              >
                 Evaluaciones Neuropsicológicas
               </a>
             </li>
-            <li>
-              <a href={`/dashboard/pacientes/${pacienteId}/notas`}>
+            <li className={styles.moduleItem}>
+              <a
+                href={`/dashboard/pacientes/${pacienteId}/notas`}
+                className={styles.moduleLink}
+              >
                 Notas de Evolución (SOAP)
               </a>
             </li>
-            <li>
-              <a href={`/dashboard/pacientes/${pacienteId}/documentos`}>
+            <li className={styles.moduleItem}>
+              <a
+                href={`/dashboard/pacientes/${pacienteId}/documentos`}
+                className={styles.moduleLink}
+              >
                 Documentos Adjuntos
               </a>
             </li>
           </ul>
 
-          <p style={{ marginTop: '16px' }}>
-            <a href="/dashboard/pacientes">← Volver a la lista de pacientes</a>
-          </p>
+          <a href="/dashboard/pacientes" className={styles.backLink}>
+            <span aria-hidden="true">←</span>
+            <span>Volver a la lista de pacientes</span>
+          </a>
         </>
       )}
     </div>

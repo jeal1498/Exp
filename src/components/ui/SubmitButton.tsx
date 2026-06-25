@@ -19,7 +19,7 @@ export function SubmitButton({
     <button
       type="submit"
       disabled={pending}
-      aria-disabled={pending}
+      aria-busy={pending}
       className={className}
     >
       {pending ? pendingText : children}

@@ -12,9 +12,14 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   return (
     <div className={styles.shell}>
+      <a href="#main-content" className={styles.skipLink}>
+        Saltar al contenido principal
+      </a>
       <header className={styles.header}>
         <div className={styles.nav}>
-          <span className={styles.wordmark}>Expedientes Clínicos · Neuropsicología</span>
+          <a href="/dashboard" className={styles.wordmark}>
+            Expedientes Clínicos · Neuropsicología
+          </a>
           <NavLinks />
           <div className={styles.navMeta}>
             <span className={styles.userEmail}>{email}</span>
@@ -26,7 +31,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
           </div>
         </div>
       </header>
-      <main className={styles.main}>{children}</main>
+      <main id="main-content" className={styles.main}>{children}</main>
     </div>
   )
 }

@@ -1,3 +1,26 @@
+/* ─── Skip link ──────────────────────────────────────────────────────────── */
+.skipLink {
+  position: absolute;
+  top: var(--space-sm);
+  left: var(--space-sm);
+  z-index: 100;
+  padding: var(--space-sm) var(--space-md);
+  background-color: var(--color-primary);
+  color: oklch(1.000 0.000 0);
+  font-size: var(--text-label);
+  font-weight: var(--weight-medium);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  transform: translateY(-120%);
+  transition: transform var(--duration-fast) var(--ease-state);
+}
+
+.skipLink:focus {
+  transform: translateY(0);
+  outline: 2px solid oklch(1.000 0.000 0);
+  outline-offset: 2px;
+}
+
 /* ─── Shell ──────────────────────────────────────────────────────────────── */
 .shell {
   display: grid;
@@ -29,6 +52,13 @@
   color: var(--color-ink);
   letter-spacing: var(--tracking-headline);
   white-space: nowrap;
+  text-decoration: none;
+}
+
+.wordmark:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
 }
 
 /* ─── Nav links (rendered by NavLinks client component) ──────────────────── */
@@ -51,6 +81,12 @@
 
 .navLink:hover {
   color: var(--color-ink);
+}
+
+.navLink:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
 }
 
 .navLinkActive {
