@@ -90,9 +90,9 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 
 ## Estado Actual del Proyecto
 
-**Sesión activa:** Sesión 15 — COMPLETADA  
+**Sesión activa:** Sesión 20 — COMPLETADA  
 **Última actualización:** 2026-06-25  
-**Estado:** Proyecto en producción. Login operativo sin MFA. Sistema de diseño completo (DESIGN.md + tokens CSS). Página de login y dashboard rediseñados con impeccable craft. Dashboard responsivo para móvil, tablet y escritorio.
+**Estado:** Proyecto en producción. Módulo de evaluaciones con inalterabilidad NOM-004 completa (is_locked + SHA-256). Constantes centralizadas. Paginación en lista de pacientes. Build limpio, 16 rutas SSR.
 
 ---
 
