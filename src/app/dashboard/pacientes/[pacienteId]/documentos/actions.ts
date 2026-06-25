@@ -3,6 +3,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { uploadDocumento, deleteDocumento, type BucketId } from '@/lib/storage'
+import { insertAuditLog } from '@/lib/supabase/audit'
 
 const ALLOWED_TYPES = new Set([
   'application/pdf',
@@ -41,7 +42,7 @@ export async function subirDocumento(
     )
   }
 
-  await supabase.from('logs_auditoria').insert({
+  await insertAuditLog(supabase, {
     usuario_id: userData.user.id,
     accion: 'INSERT',
     tabla_afectada: 'storage',
@@ -76,7 +77,7 @@ export async function eliminarDocumento(
     )
   }
 
-  await supabase.from('logs_auditoria').insert({
+  await insertAuditLog(supabase, {
     usuario_id: userData.user.id,
     accion: 'DELETE',
     tabla_afectada: 'storage',

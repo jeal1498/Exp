@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { insertAuditLog } from '@/lib/supabase/audit'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = { title: 'Detalle de Evaluación — Expedientes Clínicos' }
@@ -36,7 +37,7 @@ export default async function EvaluacionDetallePage({
     .single()
 
   // NOM-024: registrar acceso SELECT a evaluaciones_neuro
-  await supabase.from('logs_auditoria').insert({
+  await insertAuditLog(supabase, {
     usuario_id:     userData.user.id,
     tabla_afectada: 'evaluaciones_neuro',
     registro_id:    evaluacionId,

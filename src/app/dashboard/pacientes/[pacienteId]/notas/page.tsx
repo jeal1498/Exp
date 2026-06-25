@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { insertAuditLog } from '@/lib/supabase/audit'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = { title: 'Notas de Evolución — Expedientes Clínicos' }
@@ -29,7 +30,7 @@ export default async function NotasPage({
     .order('fecha_nota', { ascending: false })
 
   // NOM-024: registrar acceso SELECT a notas_evolucion
-  await supabase.from('logs_auditoria').insert({
+  await insertAuditLog(supabase, {
     usuario_id: userData.user.id,
     tabla_afectada: 'notas_evolucion',
     registro_id: null,

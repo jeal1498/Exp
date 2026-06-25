@@ -40,7 +40,7 @@ export default async function DocumentosPage({
 
   const { data: paciente } = await supabase
     .from('pacientes')
-    .select('nombre, apellido_paterno')
+    .select('id, nombre, apellido_paterno')
     .eq('id', pacienteId)
     .eq('is_active', true)
     .single()
