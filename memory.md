@@ -291,6 +291,16 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 
 ---
 
+## Usuarios de Producción
+
+| Correo | Contraseña | Notas |
+|--------|------------|-------|
+| `lalolopezxd@gmail.com` | `Hx7$kP3#mN9@wQ` | Reseteada sesión 10 — MFA pendiente de configurar |
+| `karentrujillopsic@gmail.com` | *(desconocida)* | Creada 25 mar 2026 |
+| `jeal1498@gmail.com` | *(desconocida)* | Creada 21 mar 2026 |
+
+---
+
 ## Reglas de Sesión (No Modificar)
 
 1. Solo se ejecuta UNA etapa por sesión.
