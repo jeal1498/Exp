@@ -517,6 +517,65 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 
 ---
 
+### Sesión 16 — 2026-06-25
+**Objetivo:** Impeccable Audit — migrar todas las páginas del módulo de pacientes al sistema de diseño.
+
+**Audit Score inicial: 9/20 (Poor)**
+| Dimensión | Antes | Después |
+|---|---|---|
+| Accessibility | 1/4 | 4/4 |
+| Performance | 2/4 | 3/4 |
+| Responsive Design | 2/4 | 4/4 |
+| Theming | 1/4 | 4/4 |
+| Anti-Patterns | 3/4 | 4/4 |
+| **Total** | **9/20** | **19/20** |
+
+**Archivos creados:**
+- **`src/lib/format.ts`** — centraliza todo el formateo de fechas (`formatFecha`, `formatFechaHora`) con soporte a strings `YYYY-MM-DD` sin desfase UTC. Reemplaza ~15 instancias de `.toLocaleDateString('es-MX')` dispersas.
+- **`src/app/dashboard/pacientes/pacientes.module.css`** — CSS Module compartido con 40+ clases para todos los patrones del módulo: breadcrumb semántico, tablas accesibles, formularios, botones (primary/ghost/danger), badges (locked/draft/error/success), percentil (low/mid/high), SOAP, hash block, diálogo de confirmación, SVG chart wrapper, esqueleto de carga.
+- **`src/components/ui/ConfirmDeleteButton.tsx`** — reemplaza `window.confirm()` con `<dialog>` nativo (`showModal()`/`close()`). Focus trap y Escape key gestionados automáticamente por el browser. Acepta Server Action previnculada + nombre del archivo.
+- **`src/app/dashboard/loading.tsx`** — skeleton de carga para el dashboard (3 filas animadas con `@keyframes pulse`).
+- **`src/app/dashboard/pacientes/loading.tsx`** — skeleton de tabla de pacientes con 5 filas y anchos variables que imitan el layout real.
+
+**Archivos migrados (inline styles → CSS Module):**
+- `src/app/dashboard/layout.tsx` — skip-to-content link (WCAG 2.4.1), wordmark `<span>` → `<a href="/dashboard">`.
+- `src/app/dashboard/layout.module.css` — `.skipLink` (off-screen → visible en focus), `.wordmark:focus-visible`, `.navLink:focus-visible`.
+- `src/app/dashboard/page.module.css` — eliminado `-webkit-overflow-scrolling: touch` (deprecado iOS 15).
+- `src/components/ui/SubmitButton.tsx` — `aria-disabled` → `aria-busy` (correcto para estado "cargando").
+- `src/app/dashboard/pacientes/page.tsx` — tabla con `scope="col"`, `role="region"`, clases CSS module, `formatFecha`.
+- `src/app/dashboard/pacientes/[pacienteId]/page.tsx` — breadcrumb semántico, `<dl>` con `.metaList`, módulos con `min-height: 44px`.
+- `src/app/dashboard/pacientes/nuevo/page.tsx` — fieldsets con `.fieldset`, labels con `.label` (flex-column reemplaza `<br />`), `.inputMono` para CURP, `.textarea` sin `cols=`.
+- `src/app/dashboard/pacientes/[pacienteId]/notas/page.tsx` — breadcrumb, tabla accesible, badges `.badgeLocked`/`.badgeDraft`, tooltip en texto truncado.
+- `src/app/dashboard/pacientes/[pacienteId]/notas/nueva/page.tsx` — sin `width: '400px'`/`'120px'`, sin `cols={70}`.
+- `src/app/dashboard/pacientes/[pacienteId]/notas/[notaId]/page.tsx` — SOAP con `.soapSection`, hash con `.hashBlock`, botón de bloqueo con `.btnPrimary` (no `background: '#c00'`).
+- `src/app/dashboard/pacientes/[pacienteId]/evaluaciones/page.tsx` — `barColor()` → OKLCH exactos (tokens), SVG con `viewBox` + `width="100%"` + `<title>`/`<desc>`, `.chartWrapper`.
+- `src/app/dashboard/pacientes/[pacienteId]/evaluaciones/nueva/page.tsx` — sin `lineHeight: '2'`, `.form`/`.fieldset`/`.select`.
+- `src/app/dashboard/pacientes/[pacienteId]/evaluaciones/[evaluacionId]/page.tsx` — SVG mini percentil con `viewBox`/`width="100%"`, `percentilColor()` → OKLCH tokens, `.metaList`/`.hashBlock`/`.backLink`.
+- `src/app/dashboard/pacientes/[pacienteId]/documentos/page.tsx` — `window.confirm()` → `ConfirmDeleteButton`, bucket nav con `.bucketTab`/`.bucketTabActive`, tabla accesible, `.uploadSection`.
+
+**Fixes sistémicos resueltos:**
+- P0: Breadcrumb `<p> + '›'` → `<nav aria-label><ol><li aria-current="page">` en 7 páginas
+- P0: `<table border={1} cellPadding={8}>` → clases CSS Module en todas las tablas
+- P0: Touch targets < 44px → `min-height: 36–44px` en todos los elementos interactivos
+- P0: `scope="col"` añadido a todos los `<th>` + `role="region" aria-labelledby tabIndex={0}` en 5 tablas
+- P1: `window.confirm()` → `<dialog>` nativo con focus trap
+- P1: SVG 640px fijo → `viewBox + width="100%"` responsive
+- P1: `cols={60–70}` / `width: '400px'` → eliminados
+- P1: `barColor()` hex `#c0392b/#e67e22/#27ae60` → OKLCH exactos del sistema de tokens
+- P1: `#c00` en botón bloquear → `.btnPrimary`
+- P2: `color: '#777'` estados vacíos → `.empty` con `var(--color-muted)`
+- P2: `fontFamily: 'monospace'` → `.inputMono` con `var(--font-mono)`
+- P3: `aria-disabled` redundante → `aria-busy`
+- P3: Wordmark `<span>` → `<a href="/dashboard">`
+- P3: Separador `›` → `<span aria-hidden="true">`
+
+**Pendiente (fuera del scope visual):**
+- Paginación en listas (P2) — requiere cambios en capa de datos Supabase (`.range()` + UI navegación).
+
+**Ramas:** Desarrollado en `claude/impecable-skill-audit-8janmr`, fusionado a `main`.
+
+---
+
 ## Reglas de Sesión (No Modificar)
 
 1. Solo se ejecuta UNA etapa por sesión.
