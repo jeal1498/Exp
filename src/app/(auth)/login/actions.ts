@@ -23,12 +23,6 @@ export async function signIn(formData: FormData): Promise<never> {
     timestamp: new Date().toISOString(),
   })
 
-  if (result.data.requiresMfa) {
-    redirect(
-      `/verify-mfa?factorId=${result.data.factorId}&redirect=${encodeURIComponent(redirectTo)}`,
-    )
-  }
-
-  // MFA no inscrito: obligar inscripción (MFA es mandatoria para sistema clínico)
-  redirect('/enroll-mfa')
+  // MFA desactivado temporalmente — redirigir directamente al dashboard
+  redirect(redirectTo)
 }

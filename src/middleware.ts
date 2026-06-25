@@ -33,21 +33,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl)
   }
 
-  const { data: aalData } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
-
-  if (aalData?.currentLevel !== 'aal2') {
-    const { data: factors } = await supabase.auth.mfa.listFactors()
-    const totpFactors = factors?.totp ?? []
-
-    if (totpFactors.length > 0) {
-      const mfaUrl = new URL('/verify-mfa', request.url)
-      mfaUrl.searchParams.set('factorId', totpFactors[0].id)
-      mfaUrl.searchParams.set('redirect', request.nextUrl.pathname)
-      return NextResponse.redirect(mfaUrl)
-    }
-
-    return NextResponse.redirect(new URL('/enroll-mfa', request.url))
-  }
+  // MFA desactivado temporalmente — solo se requiere autenticación básica (AAL1)
 
   return response
 }
