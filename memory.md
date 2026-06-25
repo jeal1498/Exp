@@ -661,6 +661,65 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 
 ---
 
+### Sesión 20 — 2026-06-25
+**Objetivo:** Completar los pendientes técnicos identificados en la auditoría de Sesión 19.
+
+**Logrado:**
+
+**1. Fuente única de constantes (`src/lib/evaluaciones-constants.ts`)**
+- Creado módulo centralizado con `DOMINIOS`, `Dominio` (tipo), `DOMINIOS_LABEL` y `PRUEBAS_COMUNES`.
+- Eliminadas las 3 copias duplicadas: `evaluaciones/page.tsx`, `evaluaciones/nueva/page.tsx`, `evaluaciones/nueva/actions.ts` ahora importan desde este módulo.
+
+**2. Inalterabilidad de evaluaciones (NOM-004 Art. 9 / NOM-024)**
+- `supabase/migrations/20260625000003_evaluaciones_lock.sql`:
+  - `ALTER TABLE evaluaciones_neuro ADD COLUMN is_locked boolean NOT NULL DEFAULT false`
+  - `ADD COLUMN locked_at timestamptz NULL`
+  - `ADD COLUMN hash_integridad text NULL`
+  - Trigger `trg_prevent_evaluacion_update`: bloquea UPDATE cuando `is_locked = true`.
+  - Trigger `trg_prevent_evaluacion_delete`: bloquea DELETE siempre (inalterabilidad total).
+  - Migración aplicada en Supabase `mxcmfhxnjcwoueqwvzyb` vía MCP.
+- `src/types/database.types.ts`: agregados `is_locked`, `locked_at`, `hash_integridad` en Row/Insert/Update de `evaluaciones_neuro`.
+- `src/app/dashboard/pacientes/[pacienteId]/evaluaciones/[evaluacionId]/actions.ts` — **nuevo**: Server Action `bloquearEvaluacion`:
+  - Fetch completo del registro, guard `is_locked`, SHA-256 de los campos clínicos inmutables, UPDATE atómico con `.eq('is_locked', false)`.
+- `src/app/dashboard/pacientes/[pacienteId]/evaluaciones/[evaluacionId]/page.tsx` — reescrito:
+  - Acepta `searchParams` para mensajes de error.
+  - Badge `BLOQUEADA — NOM-004 Art. 9` / `BORRADOR` en el encabezado.
+  - Sección "Inalterabilidad": si desbloqueada muestra advertencia y botón "Bloquear Evaluación (acción irreversible)"; si bloqueada muestra `locked_at` y hash SHA-256.
+  - Importa `bloquearEvaluacion` con `.bind()` como Server Action del `<form>`.
+- `src/app/dashboard/pacientes/[pacienteId]/evaluaciones/page.tsx`:
+  - Agrega columna "Estado" en la tabla con badge Bloqueada/Borrador por fila.
+  - Query incluye `is_locked` en el SELECT.
+
+**3. Paginación en lista de pacientes**
+- `src/app/dashboard/pacientes/page.tsx`:
+  - Recibe `searchParams.page` (número de página, mín 1).
+  - Query Supabase con `.range(from, to)` y `count: 'exact'` para total de registros.
+  - `PAGE_SIZE = 20` registros por página.
+  - Nav de paginación: botones "← Anterior" / "Siguiente →" (deshabilitados en bordes), indicador "Página X de Y — Z pacientes".
+- `src/app/dashboard/pacientes/pacientes.module.css`:
+  - Nuevas clases: `.pagination`, `.paginationBtn`, `.paginationBtnDisabled`, `.paginationInfo`, `.paginationCount`.
+  - Diseño: flex row centrado, border-top divisor, tokens del sistema de diseño, focus ring, `transition: none` en `prefers-reduced-motion`.
+
+**Build:** `./node_modules/.bin/next build` — 0 errores TypeScript, 16 rutas compiladas.
+
+**Archivos creados:**
+- `src/lib/evaluaciones-constants.ts`
+- `src/app/dashboard/pacientes/[pacienteId]/evaluaciones/[evaluacionId]/actions.ts`
+- `supabase/migrations/20260625000003_evaluaciones_lock.sql`
+
+**Archivos modificados:**
+- `src/types/database.types.ts`
+- `src/app/dashboard/pacientes/[pacienteId]/evaluaciones/[evaluacionId]/page.tsx`
+- `src/app/dashboard/pacientes/[pacienteId]/evaluaciones/page.tsx`
+- `src/app/dashboard/pacientes/[pacienteId]/evaluaciones/nueva/page.tsx`
+- `src/app/dashboard/pacientes/[pacienteId]/evaluaciones/nueva/actions.ts`
+- `src/app/dashboard/pacientes/page.tsx`
+- `src/app/dashboard/pacientes/pacientes.module.css`
+
+**Estado al cerrar sesión:** Todos los pendientes técnicos de Sesión 19 completados. No quedan brechas abiertas de cumplimiento normativo en el módulo de evaluaciones.
+
+---
+
 ## Reglas de Sesión (No Modificar)
 
 1. Solo se ejecuta UNA etapa por sesión.

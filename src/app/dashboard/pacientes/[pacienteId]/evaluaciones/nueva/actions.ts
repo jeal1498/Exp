@@ -2,17 +2,9 @@
 
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { DOMINIOS } from '@/lib/evaluaciones-constants'
 
-const DOMINIOS_VALIDOS: readonly string[] = [
-  'Memoria',
-  'Atencion',
-  'Funciones Ejecutivas',
-  'Lenguaje',
-  'Visuoespacial',
-  'Velocidad de Procesamiento',
-  'Habilidades Academicas',
-  'Conducta y Emocion',
-]
+const DOMINIOS_VALIDOS: readonly string[] = DOMINIOS
 
 export async function crearEvaluacion(pacienteId: string, formData: FormData): Promise<never> {
   const supabase = await createClient()

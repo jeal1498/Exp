@@ -1,7 +1,8 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { insertAuditLog } from '@/lib/supabase/audit'
-import { formatFecha } from '@/lib/format'
+import { formatFecha, formatFechaHora } from '@/lib/format'
+import { bloquearEvaluacion } from './actions'
 import styles from '../../../pacientes.module.css'
 import type { Metadata } from 'next'
 
@@ -21,10 +22,13 @@ function percentilColor(p: number): string {
 
 export default async function EvaluacionDetallePage({
   params,
+  searchParams,
 }: {
   params: Promise<{ pacienteId: string; evaluacionId: string }>
+  searchParams: Promise<{ error?: string }>
 }) {
   const { pacienteId, evaluacionId } = await params
+  const sp = await searchParams
   const supabase = await createClient()
 
   const { data: userData } = await supabase.auth.getUser()
@@ -39,12 +43,11 @@ export default async function EvaluacionDetallePage({
 
   const { data: ev, error } = await supabase
     .from('evaluaciones_neuro')
-    .select('id, fecha_evaluacion, nombre_prueba, dominio, puntaje_bruto, percentil, puntuacion_estandar, observaciones, datos_adicionales, created_at')
+    .select('id, fecha_evaluacion, nombre_prueba, dominio, puntaje_bruto, percentil, puntuacion_estandar, observaciones, datos_adicionales, is_locked, locked_at, hash_integridad, created_at')
     .eq('id', evaluacionId)
     .eq('paciente_id', pacienteId)
     .single()
 
-  // NOM-024: registrar acceso SELECT a evaluaciones_neuro
   await insertAuditLog(supabase, {
     usuario_id:     userData.user.id,
     tabla_afectada: 'evaluaciones_neuro',
@@ -56,6 +59,8 @@ export default async function EvaluacionDetallePage({
   const nombrePaciente = paciente
     ? `${paciente.nombre} ${paciente.apellido_paterno}`
     : 'Paciente'
+
+  const bloquearBound = bloquearEvaluacion.bind(null, pacienteId, evaluacionId)
 
   return (
     <div>
@@ -85,6 +90,12 @@ export default async function EvaluacionDetallePage({
         </ol>
       </nav>
 
+      {sp.error && (
+        <p role="alert" className={styles.alert}>
+          {decodeURIComponent(sp.error)}
+        </p>
+      )}
+
       {(error || !ev) && (
         <p role="alert" className={styles.alert}>
           Evaluación no encontrada o sin acceso.
@@ -93,7 +104,14 @@ export default async function EvaluacionDetallePage({
 
       {ev && (
         <>
-          <h1 className={styles.pageTitle}>Evaluación: {ev.nombre_prueba}</h1>
+          <div className={styles.pageHeader}>
+            <h1 className={styles.pageTitle}>Evaluación: {ev.nombre_prueba}</h1>
+            {ev.is_locked ? (
+              <span className={`${styles.badge} ${styles.badgeLocked}`}>BLOQUEADA — NOM-004 Art. 9</span>
+            ) : (
+              <span className={`${styles.badge} ${styles.badgeDraft}`}>BORRADOR</span>
+            )}
+          </div>
 
           <dl className={styles.metaList}>
             <dt className={styles.metaLabel}>Fecha de evaluación</dt>
@@ -165,9 +183,39 @@ export default async function EvaluacionDetallePage({
               </>
             )}
 
-            <dt className={styles.metaLabel}>Registrado</dt>
+            <dt className={styles.metaLabel}>Registrada</dt>
             <dd className={styles.metaValue}>{formatFecha(ev.created_at)}</dd>
           </dl>
+
+          <hr className={styles.divider} />
+
+          <h2 className={styles.sectionHeading}>Inalterabilidad (NOM-004 Art. 9 / NOM-024)</h2>
+
+          {ev.is_locked ? (
+            <dl className={styles.metaList}>
+              <dt className={styles.metaLabel}>Bloqueada el</dt>
+              <dd className={styles.metaValue}>{formatFechaHora(ev.locked_at!)}</dd>
+
+              <dt className={styles.metaLabel}>Hash de integridad SHA-256 (NOM-024)</dt>
+              <dd className={styles.metaValue}>
+                <code className={styles.hashBlock}>{ev.hash_integridad}</code>
+              </dd>
+            </dl>
+          ) : (
+            <div>
+              <p className={styles.lockWarning}>
+                Una vez bloqueada, la evaluación no puede modificarse (NOM-004 Art. 9).
+                El sistema generará un hash SHA-256 del contenido para garantizar su integridad (NOM-024).
+              </p>
+              <form action={bloquearBound}>
+                <button type="submit" className={styles.btnPrimary}>
+                  Bloquear Evaluación (acción irreversible)
+                </button>
+              </form>
+            </div>
+          )}
+
+          <hr className={styles.divider} />
 
           <a href={`/dashboard/pacientes/${pacienteId}/evaluaciones`} className={styles.backLink}>
             <span aria-hidden="true">←</span>

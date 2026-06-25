@@ -159,6 +159,9 @@ export interface Database {
           puntuacion_estandar: number | null
           datos_adicionales: Json | null
           observaciones: string | null
+          is_locked: boolean
+          locked_at: string | null
+          hash_integridad: string | null
           created_by: string
         }
         Insert: {
@@ -173,6 +176,9 @@ export interface Database {
           puntuacion_estandar?: number | null
           datos_adicionales?: Json | null
           observaciones?: string | null
+          is_locked?: boolean
+          locked_at?: string | null
+          hash_integridad?: string | null
           created_by: string
         }
         Update: {
@@ -187,6 +193,9 @@ export interface Database {
           puntuacion_estandar?: number | null
           datos_adicionales?: Json | null
           observaciones?: string | null
+          is_locked?: boolean
+          locked_at?: string | null
+          hash_integridad?: string | null
           created_by?: string
         }
         Relationships: [

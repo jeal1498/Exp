@@ -2,23 +2,13 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { insertAuditLog } from '@/lib/supabase/audit'
 import { formatFecha } from '@/lib/format'
+import { DOMINIOS, DOMINIOS_LABEL } from '@/lib/evaluaciones-constants'
 import styles from '../../pacientes.module.css'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = { title: 'Evaluaciones Neuropsicológicas — Expedientes Clínicos' }
 
-const DOMINIOS_LABEL: Record<string, string> = {
-  'Memoria':                    'Mem',
-  'Atencion':                   'Aten',
-  'Funciones Ejecutivas':       'FE',
-  'Lenguaje':                   'Leng',
-  'Visuoespacial':              'Visuo',
-  'Velocidad de Procesamiento': 'VP',
-  'Habilidades Academicas':     'HabAc',
-  'Conducta y Emocion':         'CyE',
-}
-
-const DOMINIOS_ORDER = Object.keys(DOMINIOS_LABEL)
+const DOMINIOS_ORDER = [...DOMINIOS]
 
 // Returns OKLCH values matching design tokens exactly
 function barColorVar(percentil: number): string {
@@ -53,7 +43,7 @@ export default async function EvaluacionesPage({
 
   const { data: evaluaciones, error } = await supabase
     .from('evaluaciones_neuro')
-    .select('id, fecha_evaluacion, nombre_prueba, dominio, puntaje_bruto, percentil, puntuacion_estandar, created_at')
+    .select('id, fecha_evaluacion, nombre_prueba, dominio, puntaje_bruto, percentil, puntuacion_estandar, is_locked, created_at')
     .eq('paciente_id', pacienteId)
     .order('fecha_evaluacion', { ascending: false })
 
@@ -154,6 +144,7 @@ export default async function EvaluacionesPage({
                   <th scope="col" className={`${styles.th} ${styles.thNumeric}`}>Puntaje bruto</th>
                   <th scope="col" className={`${styles.th} ${styles.thNumeric}`}>Percentil</th>
                   <th scope="col" className={`${styles.th} ${styles.thNumeric}`}>Puntaje estándar</th>
+                  <th scope="col" className={styles.th}>Estado</th>
                   <th scope="col" className={styles.th}>Acciones</th>
                 </tr>
               </thead>
@@ -172,6 +163,13 @@ export default async function EvaluacionesPage({
                       ) : '—'}
                     </td>
                     <td className={`${styles.td} ${styles.tdNumeric}`}>{ev.puntuacion_estandar ?? '—'}</td>
+                    <td className={styles.td}>
+                      {ev.is_locked ? (
+                        <span className={`${styles.badge} ${styles.badgeLocked}`}>Bloqueada</span>
+                      ) : (
+                        <span className={`${styles.badge} ${styles.badgeDraft}`}>Borrador</span>
+                      )}
+                    </td>
                     <td className={`${styles.td} ${styles.actionsCell}`}>
                       <a
                         href={`/dashboard/pacientes/${pacienteId}/evaluaciones/${ev.id}`}
