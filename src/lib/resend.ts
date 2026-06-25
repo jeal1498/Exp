@@ -1,6 +1,8 @@
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+function getResend() {
+  return new Resend(process.env.RESEND_API_KEY ?? 'placeholder')
+}
 
 type EmailResult =
   | { data: { id: string }; error: null }
@@ -12,7 +14,7 @@ export async function sendLoginAlertEmail(params: {
   timestamp: string
 }): Promise<EmailResult> {
   try {
-    const { data, error } = await resend.emails.send({
+    const { data, error } = await getResend().emails.send({
       from: process.env.RESEND_FROM_EMAIL ?? 'notificaciones@expedientesclinicos.mx',
       to: params.to,
       subject: 'Alerta de seguridad: Inicio de sesión detectado',
@@ -44,7 +46,7 @@ export async function sendNotaLockedEmail(params: {
   hashIntegridad: string
 }): Promise<EmailResult> {
   try {
-    const { data, error } = await resend.emails.send({
+    const { data, error } = await getResend().emails.send({
       from: process.env.RESEND_FROM_EMAIL ?? 'notificaciones@expedientesclinicos.mx',
       to: params.to,
       subject: 'Nota de evolución bloqueada (NOM-004)',
