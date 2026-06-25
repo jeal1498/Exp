@@ -1,14 +1,22 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { insertAuditLog } from '@/lib/supabase/audit'
+import { formatFecha } from '@/lib/format'
+import styles from '../../../pacientes.module.css'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = { title: 'Detalle de Evaluación — Expedientes Clínicos' }
 
+function percentilClass(p: number): string {
+  if (p < 25) return styles.percentilLow
+  if (p < 75) return styles.percentilMid
+  return styles.percentilHigh
+}
+
 function percentilColor(p: number): string {
-  if (p < 25) return '#c0392b'
-  if (p < 75) return '#e67e22'
-  return '#27ae60'
+  if (p < 25) return 'oklch(0.430 0.155 22)'  // --color-error
+  if (p < 75) return 'oklch(0.560 0.095 55)'  // --color-compliance
+  return 'oklch(0.430 0.130 155)'              // --color-success
 }
 
 export default async function EvaluacionDetallePage({
@@ -51,49 +59,72 @@ export default async function EvaluacionDetallePage({
 
   return (
     <div>
-      <p style={{ fontSize: '0.85em', color: '#555' }}>
-        <a href="/dashboard/pacientes">Pacientes</a>
-        {' › '}
-        <a href={`/dashboard/pacientes/${pacienteId}`}>{nombrePaciente}</a>
-        {' › '}
-        <a href={`/dashboard/pacientes/${pacienteId}/evaluaciones`}>Evaluaciones</a>
-        {' › Detalle'}
-      </p>
+      <nav aria-label="Migas de pan" className={styles.breadcrumb}>
+        <ol className={styles.breadcrumbList}>
+          <li className={styles.breadcrumbItem}>
+            <a href="/dashboard/pacientes">Pacientes</a>
+          </li>
+          <li className={styles.breadcrumbItem} aria-hidden="true">
+            <span className={styles.breadcrumbSep}>›</span>
+          </li>
+          <li className={styles.breadcrumbItem}>
+            <a href={`/dashboard/pacientes/${pacienteId}`}>{nombrePaciente}</a>
+          </li>
+          <li className={styles.breadcrumbItem} aria-hidden="true">
+            <span className={styles.breadcrumbSep}>›</span>
+          </li>
+          <li className={styles.breadcrumbItem}>
+            <a href={`/dashboard/pacientes/${pacienteId}/evaluaciones`}>Evaluaciones</a>
+          </li>
+          <li className={styles.breadcrumbItem} aria-hidden="true">
+            <span className={styles.breadcrumbSep}>›</span>
+          </li>
+          <li className={styles.breadcrumbItem} aria-current="page">
+            Detalle
+          </li>
+        </ol>
+      </nav>
 
       {(error || !ev) && (
-        <p role="alert" style={{ color: 'red', border: '1px solid red', padding: '8px' }}>
+        <p role="alert" className={styles.alert}>
           Evaluación no encontrada o sin acceso.
         </p>
       )}
 
       {ev && (
         <>
-          <h1>Evaluación: {ev.nombre_prueba}</h1>
+          <h1 className={styles.pageTitle}>Evaluación: {ev.nombre_prueba}</h1>
 
-          <dl style={{ lineHeight: '1.8' }}>
-            <dt><strong>Fecha de evaluación</strong></dt>
-            <dd>{new Date(ev.fecha_evaluacion).toLocaleDateString('es-MX')}</dd>
+          <dl className={styles.metaList}>
+            <dt className={styles.metaLabel}>Fecha de evaluación</dt>
+            <dd className={styles.metaValue}>{formatFecha(ev.fecha_evaluacion)}</dd>
 
-            <dt><strong>Prueba</strong></dt>
-            <dd>{ev.nombre_prueba}</dd>
+            <dt className={styles.metaLabel}>Prueba</dt>
+            <dd className={styles.metaValue}>{ev.nombre_prueba}</dd>
 
-            <dt><strong>Dominio cognitivo</strong></dt>
-            <dd>{ev.dominio}</dd>
+            <dt className={styles.metaLabel}>Dominio cognitivo</dt>
+            <dd className={styles.metaValue}>{ev.dominio}</dd>
 
-            <dt><strong>Puntaje bruto</strong></dt>
-            <dd>{ev.puntaje_bruto ?? '—'}</dd>
+            <dt className={styles.metaLabel}>Puntaje bruto</dt>
+            <dd className={styles.metaValue}>{ev.puntaje_bruto ?? '—'}</dd>
 
-            <dt><strong>Percentil</strong></dt>
-            <dd>
+            <dt className={styles.metaLabel}>Percentil</dt>
+            <dd className={styles.metaValue}>
               {ev.percentil !== null && ev.percentil !== undefined ? (
                 <>
-                  <span style={{ fontWeight: 'bold', color: percentilColor(ev.percentil) }}>
+                  <span className={percentilClass(ev.percentil)}>
                     {ev.percentil}
                   </span>
                   {' / 100'}
-                  <div style={{ marginTop: '6px' }}>
-                    <svg width={300} height={24} role="img" aria-label={`Percentil ${ev.percentil}`}>
-                      <rect x={0} y={6} width={300} height={12} fill="#eee" rx={4} />
+                  <div className={styles.chartWrapper}>
+                    <svg
+                      viewBox="0 0 300 24"
+                      width="100%"
+                      role="img"
+                      aria-labelledby={`chart-pct-title-${ev.id}`}
+                    >
+                      <title id={`chart-pct-title-${ev.id}`}>Percentil {ev.percentil} de 100</title>
+                      <rect x={0} y={6} width={300} height={12} fill="oklch(0.950 0.000 0)" rx={4} />
                       <rect
                         x={0} y={6}
                         width={Math.round((ev.percentil / 100) * 300)}
@@ -101,45 +132,47 @@ export default async function EvaluacionDetallePage({
                         fill={percentilColor(ev.percentil)}
                         rx={4}
                       />
-                      {/* Reference markers at 25 and 75 */}
-                      <line x1={75}  y1={4} x2={75}  y2={20} stroke="#555" strokeWidth={1} />
-                      <line x1={225} y1={4} x2={225} y2={20} stroke="#555" strokeWidth={1} />
-                      <text x={75}  y={22} textAnchor="middle" fontSize={9} fill="#555">25</text>
-                      <text x={225} y={22} textAnchor="middle" fontSize={9} fill="#555">75</text>
+                      <line x1={75}  y1={4} x2={75}  y2={20} stroke="oklch(0.510 0.016 200)" strokeWidth={1} />
+                      <line x1={225} y1={4} x2={225} y2={20} stroke="oklch(0.510 0.016 200)" strokeWidth={1} />
+                      <text x={75}  y={22} textAnchor="middle" fontSize={9} fill="oklch(0.510 0.016 200)">25</text>
+                      <text x={225} y={22} textAnchor="middle" fontSize={9} fill="oklch(0.510 0.016 200)">75</text>
                     </svg>
                   </div>
                 </>
               ) : '—'}
             </dd>
 
-            <dt><strong>Puntuación estándar</strong></dt>
-            <dd>{ev.puntuacion_estandar ?? '—'}</dd>
+            <dt className={styles.metaLabel}>Puntuación estándar</dt>
+            <dd className={styles.metaValue}>{ev.puntuacion_estandar ?? '—'}</dd>
 
             {ev.observaciones && (
               <>
-                <dt><strong>Observaciones</strong></dt>
-                <dd style={{ whiteSpace: 'pre-wrap' }}>{ev.observaciones}</dd>
+                <dt className={styles.metaLabel}>Observaciones</dt>
+                <dd className={styles.metaValue}>
+                  <p className={styles.soapContent}>{ev.observaciones}</p>
+                </dd>
               </>
             )}
 
             {ev.datos_adicionales && (
               <>
-                <dt><strong>Datos adicionales</strong></dt>
-                <dd>
-                  <pre style={{ background: '#f5f5f5', padding: '8px', fontSize: '0.85em' }}>
+                <dt className={styles.metaLabel}>Datos adicionales</dt>
+                <dd className={styles.metaValue}>
+                  <code className={styles.hashBlock}>
                     {JSON.stringify(ev.datos_adicionales, null, 2)}
-                  </pre>
+                  </code>
                 </dd>
               </>
             )}
 
-            <dt><strong>Registrado</strong></dt>
-            <dd>{new Date(ev.created_at).toLocaleDateString('es-MX')}</dd>
+            <dt className={styles.metaLabel}>Registrado</dt>
+            <dd className={styles.metaValue}>{formatFecha(ev.created_at)}</dd>
           </dl>
 
-          <p style={{ marginTop: '16px' }}>
-            <a href={`/dashboard/pacientes/${pacienteId}/evaluaciones`}>← Volver a evaluaciones</a>
-          </p>
+          <a href={`/dashboard/pacientes/${pacienteId}/evaluaciones`} className={styles.backLink}>
+            <span aria-hidden="true">←</span>
+            <span>Volver a evaluaciones</span>
+          </a>
         </>
       )}
     </div>

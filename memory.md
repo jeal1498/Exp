@@ -90,9 +90,9 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 
 ## Estado Actual del Proyecto
 
-**Sesión activa:** Sesión 11 — COMPLETADA  
+**Sesión activa:** Sesión 15 — COMPLETADA  
 **Última actualización:** 2026-06-25  
-**Estado:** Proyecto en producción. Login operativo sin MFA. App accesible y funcional.
+**Estado:** Proyecto en producción. Login operativo sin MFA. Sistema de diseño completo (DESIGN.md + tokens CSS). Página de login y dashboard rediseñados con impeccable craft. Dashboard responsivo para móvil, tablet y escritorio.
 
 ---
 
@@ -352,6 +352,227 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 | `lalolopezxd@gmail.com` | `Hx7$kP3#mN9@wQ` | Reseteada sesión 10 — MFA pendiente de configurar |
 | `karentrujillopsic@gmail.com` | *(desconocida)* | Creada 25 mar 2026 |
 | `jeal1498@gmail.com` | *(desconocida)* | Creada 21 mar 2026 |
+
+---
+
+---
+
+### Sesión 12 — 2026-06-25
+**Objetivo:** Instalar la skill **impeccable** de diseño UI/UX en el proyecto.
+
+**Logrado:**
+- Instalada la skill `impeccable` vía `npx impeccable skills install` en `.claude/skills/impeccable/`.
+- 96 archivos instalados bajo `.claude/skills/impeccable/`:
+  - **Referencias de comandos** (`reference/`): adapt, animate, audit, bolder, brand, clarify, codex, colorize, craft, critique, delight, distill, document, extract, harden, hooks, init, interaction-design, layout, live, onboard, optimize, overdrive, polish, product, quieter, shape, typeset.
+  - **Scripts** (`scripts/`): detección de anti-patrones UI, utilidades de diseño, servidor live, integración con browser/Playwright, sistema de paletas de color.
+- Commit y push realizados en rama `claude/impeccable-style-skill-zbtqzb`.
+
+**Cómo usar la skill:**
+- `/impeccable init` — configurar el contexto de diseño del proyecto (ejecutar una vez).
+- `/impeccable audit` — detectar anti-patrones de UI en el código fuente.
+- `/impeccable polish` — pulir diseño visual de componentes.
+- `/impeccable critique` — obtener crítica de diseño detallada.
+- `npx impeccable detect src/` — análisis CLI de anti-patrones con salida JSON (útil en CI).
+
+**Estado al cerrar sesión:** Skill impeccable instalada y disponible en el proyecto.
+
+---
+
+### Sesión 13 — 2026-06-25
+**Objetivo:** Crear sistema de diseño completo con `/impeccable document` (modo seed → modo scan).
+
+**Logrado:**
+- Ejecutado `/impeccable document` en modo seed (sin código): entrevista de 5 preguntas para establecer dirección visual.
+  - Estrategia de color: Restrained + cool blue tint.
+  - Tipografía: Un solo sans-serif (Inter).
+  - Movimiento: Restrained (sin animaciones de entrada vistosas).
+  - Referencias: Linear + Stripe + GOV.UK.
+  - Anti-referencia: Consumer health apps.
+- Producido `DESIGN.md` semilla con frontmatter YAML y marcador `<!-- SEED -->`.
+- Re-ejecutado `/impeccable document` (modo scan, en español) tras confirmar código existente:
+  - `palette.mjs` generó semilla: `oklch(0.720 0.100 188.0)` — teal clínico.
+  - Construido sistema completo de tokens (15 colores en OKLCH, escala tipográfica fija en rem, radios, espaciados, focus rings, motion).
+- **`DESIGN.md`** — reescrito en español completo (headers en inglés para compatibilidad de herramientas):
+  - Frontmatter YAML machine-readable con todos los tokens.
+  - 7 Reglas Nombradas: Acento Único, Sin Calidez, Estado Funcional, Sin Decoración, Identificador Mono, Escala Fija, Plano por Defecto.
+  - North Star: "El Instrumento de Precisión".
+  - Secciones: Overview, Colors, Typography, Elevation, Components, Do's and Don'ts.
+- **`.impeccable/design.json`** — sidecar schemaVersion 2:
+  - Rampas tonales de 8 pasos (primary, ink, compliance, error, success).
+  - Shadows (focus-ring, focus-ring-error).
+  - Motion tokens (ease-state, duration-fast).
+  - Breakpoints (sm/md/lg/xl).
+  - 8 componentes con HTML/CSS autocontenidos: Botón Primario/Ghost, Campo Texto/Mono, Insignias de Cumplimiento/Error/Success, Nav, Tabla de Pacientes, Fieldset SOAP.
+- **`PRODUCT.md`** — creado durante init: personalidad de marca (Preciso, Autoritario, Compuesto), anti-referencias, principios de diseño.
+
+**Estado al cerrar sesión:** Sistema de diseño completo. DESIGN.md + design.json comprometidos en rama.
+
+---
+
+### Sesión 14 — 2026-06-25
+**Objetivo:** Construir página de login con `/impeccable craft login`.
+
+**Logrado:**
+- **`src/app/globals.css`** — capa completa de tokens de diseño como CSS Custom Properties:
+  - 15 variables `--color-*` en OKLCH.
+  - Escala tipográfica `--text-*` (display → label), pesos, line-heights, letter-spacings.
+  - Radios (`--radius-sm/md`), espaciados (`--space-xs` → `--space-2xl`).
+  - Focus rings (`--focus-ring`, `--focus-ring-error`).
+  - Motion (`--ease-state`, `--duration-fast`).
+  - Reset CSS + base body + `.auth-container` (min-height: 100dvh, cool surface bg, flex column).
+- **`src/app/layout.tsx`** — modificado:
+  - Inter vía `next/font/google` (pesos 400/500/600/700, `display: 'swap'`, variable `--font-inter`).
+  - `<html lang="es" className={inter.variable}>`.
+  - `import './globals.css'`.
+- **`src/components/ui/SubmitButton.tsx`** — componente client nuevo:
+  - `'use client'` + `useFormStatus` de react-dom.
+  - `pending` → botón disabled + texto "Iniciando sesión…".
+- **`src/app/(auth)/login/login.module.css`** — módulo CSS completo:
+  - `.page` / `.main` — scaffold flex que llena `auth-container` y empuja footer al fondo.
+  - `.container` — max-width 360px, bg blanco, borde, radius-md, `@keyframes loginEnter` (200ms, opacity + translate).
+  - `@media (prefers-reduced-motion: reduce)` — animation: none.
+  - `.header` / `.wordmark` / `.subtitle` — wordmark bold ink, subtitle muted.
+  - `.errorBanner` — fondo error-bg, borde error, ícono SVG circle-X, texto label.
+  - `.input` — transición border + box-shadow, `:focus-visible` con teal border + focus-ring.
+  - `.submit` — full-width, primary bg, blanco, `:hover` → primary-deep, `:disabled` → opacity 0.65.
+- **`src/app/(auth)/login/page.tsx`** — reescrito completamente:
+  - `SubmitButton` con pending state.
+  - Error banner semántico (`role="alert"`, `aria-atomic="true"`).
+  - `autoFocus` en campo email, `autoComplete` correctos.
+  - `redirectTo` hidden input (destino post-login).
+  - Footer con NOM-004/NOM-024 usando `&#x2011;` (non-breaking hyphens).
+- Build (`npx next build`) pasó limpio — 0 errores TS, 0 warnings.
+- Inspección visual vía Playwright: desktop (1280×800), mobile (390×844), estado de error — los tres correctos.
+
+**Archivos comprometidos:** `globals.css`, `layout.tsx`, `login.module.css`, `login/page.tsx`, `SubmitButton.tsx`.
+
+**Estado al cerrar sesión:** Página de login en producción con sistema de diseño completo. Comprometido y enviado a `claude/impeccable-init-8m5juc`, fusionado a `main`.
+
+---
+
+### Sesión 15 — 2026-06-25
+**Objetivo:** Construir panel principal del dashboard con `/impeccable craft dashboard`.
+
+**Logrado:**
+
+**Archivos creados:**
+- **`src/app/dashboard/NavLinks.tsx`** — componente cliente `'use client'` con `usePathname()`:
+  - Renderiza los links "Inicio" y "Pacientes" con `aria-current="page"` en el link activo.
+  - Aplica clase `.navLinkActive` (weight 600, ink) al link de la ruta actual.
+- **`src/app/dashboard/layout.module.css`** — CSS Module completo para el encabezado persistente:
+  - `.shell` — grid 2 filas (`auto 1fr`) que llena `100dvh`.
+  - `.header` — 48px, `background: --color-surface`, `border-bottom: 1px solid --color-border`.
+  - `.nav` — flex row con gap, padding horizontal `--space-xl`.
+  - `.wordmark` — label font, weight 600, ink, `--tracking-headline`.
+  - `.navLink` / `.navLinkActive` — muted en reposo, ink activo, transición 150ms.
+  - `.navMeta` — `margin-left: auto`, flex row con email (muted) y botón sign-out (ghost).
+  - `.signOut` — ghost button, hover → `--color-border`, focus ring.
+  - `.main` — `padding: --space-xl`.
+  - **Responsivo:** tablet (≤768px) → padding reducido; móvil (≤480px) → header en 2 filas (wordmark+sign-out arriba, navlinks abajo con `border-top`), email oculto, padding `--space-md`.
+- **`src/app/dashboard/page.module.css`** — CSS Module completo para la página dashboard:
+  - `.statsStrip` — grid 3 columnas bordeado con divisores; en ≤480px colapsa a 1 columna.
+  - `.statValue` (headline bold) / `.statLabel` (label muted) / `.statPeriod` (0.75rem muted).
+  - `.content` — grid `1fr 300px` a desktop; se apila a ≤768px.
+  - `.tableWrapper` — `overflow-x: auto` con `min-width: 480px` en la tabla interior (scroll horizontal en móvil).
+  - `.table` / `.th` / `.tr` / `.td` — tabla sin bordes en atributos HTML, totalmente estilizada con tokens.
+  - `.tr:hover .td` — fondo `--color-surface` en hover.
+  - `.expediente` — fuente mono, tracking-mono, muted.
+  - `.patientLink` — primary color, sin decoración, hover → underline.
+  - `.notesList` / `.noteItem` / `.noteHeader` / `.notePatient` / `.noteDate` / `.noteSubject` — lista compacta de notas recientes con clamp a 2 líneas.
+  - `.badge` / `.badgeLocked` (compliance amber) / `.badgeOpen` (surface + border).
+  - `.btnPrimary` / `.btnGhost` — botones full-width con todos los estados (hover, focus-visible, disabled).
+  - **Responsivo:** tablet → sidebar sube (`order: -1`), acciones en fila; móvil → acciones vuelven a columna, gap y padding reducidos.
+
+**Archivos modificados:**
+- **`src/app/dashboard/layout.tsx`** — reemplazado markup con estilos en línea por:
+  - `import NavLinks from './NavLinks'` + `import styles from './layout.module.css'`.
+  - Estructura semántica: `<div className={styles.shell}>` → `<header>` → `<div className={styles.nav}>` → `<main>`.
+  - Sin ningún estilo en línea.
+- **`src/app/dashboard/page.tsx`** — reemplazado stub completo por dashboard de producción:
+  - 5 consultas Supabase en paralelo via `Promise.all()`:
+    - `pacientes` activos (count).
+    - `notas_evolucion` del mes actual (count, filtro `gte: monthStart`).
+    - `evaluaciones_neuro` del mes actual (count).
+    - Últimos 5 pacientes (`id, numero_expediente, nombre, apellidos, created_at`).
+    - Últimas 5 notas SOAP con join a `pacientes(nombre, apellido_paterno)`, campo `is_locked`.
+  - Helper `getPaciente()` para normalizar el join (objeto o array según versión del SDK).
+  - Helper `formatFechaNota()` para fechas tipo `YYYY-MM-DD` sin desfase de zona horaria.
+  - Tipos explícitos `PacienteRow` y `NotaRow` para seguridad de tipos en el join.
+  - Renderizado:
+    - **Franja de estadísticas** — 3 celdas: pacientes activos, notas del mes, evaluaciones del mes.
+    - **Cuadrícula de contenido** (1fr 300px):
+      - Izquierda: tabla "Expedientes recientes" con No. Expediente (mono), nombre (link primary), fecha formateada.
+      - Derecha: "Acciones rápidas" (Nuevo expediente → primary, Ver todos → ghost) + "Notas recientes" (lista con nombre del paciente como link, fecha, badge NOM-004 ✓ / Abierta, subjetivo truncado 2 líneas).
+  - Estados vacíos explícitos para tabla y lista de notas.
+  - `role="region"` + `aria-labelledby` en secciones para accesibilidad.
+
+**Diseño responsivo (3 breakpoints):**
+- **≥769px (escritorio):** layout original de 2 columnas, header en una fila, padding xl.
+- **481–768px (tablet):** contenido apilado, sidebar primero (`order: -1`), acciones en fila, padding lg.
+- **≤480px (móvil):** header en 2 filas, stats en 1 columna, acciones en columna, scroll horizontal en tabla, padding md.
+
+**Build:** `npx next build` pasa limpio — 0 errores TypeScript, 16 rutas compiladas como SSR.
+
+**Ramas:** Desarrollado en `claude/impeccable-craft-dashboard-yuwd24`, fusionado a `main` y push a `origin/main`.
+
+---
+
+### Sesión 16 — 2026-06-25
+**Objetivo:** Impeccable Audit — migrar todas las páginas del módulo de pacientes al sistema de diseño.
+
+**Audit Score inicial: 9/20 (Poor)**
+| Dimensión | Antes | Después |
+|---|---|---|
+| Accessibility | 1/4 | 4/4 |
+| Performance | 2/4 | 3/4 |
+| Responsive Design | 2/4 | 4/4 |
+| Theming | 1/4 | 4/4 |
+| Anti-Patterns | 3/4 | 4/4 |
+| **Total** | **9/20** | **19/20** |
+
+**Archivos creados:**
+- **`src/lib/format.ts`** — centraliza todo el formateo de fechas (`formatFecha`, `formatFechaHora`) con soporte a strings `YYYY-MM-DD` sin desfase UTC. Reemplaza ~15 instancias de `.toLocaleDateString('es-MX')` dispersas.
+- **`src/app/dashboard/pacientes/pacientes.module.css`** — CSS Module compartido con 40+ clases para todos los patrones del módulo: breadcrumb semántico, tablas accesibles, formularios, botones (primary/ghost/danger), badges (locked/draft/error/success), percentil (low/mid/high), SOAP, hash block, diálogo de confirmación, SVG chart wrapper, esqueleto de carga.
+- **`src/components/ui/ConfirmDeleteButton.tsx`** — reemplaza `window.confirm()` con `<dialog>` nativo (`showModal()`/`close()`). Focus trap y Escape key gestionados automáticamente por el browser. Acepta Server Action previnculada + nombre del archivo.
+- **`src/app/dashboard/loading.tsx`** — skeleton de carga para el dashboard (3 filas animadas con `@keyframes pulse`).
+- **`src/app/dashboard/pacientes/loading.tsx`** — skeleton de tabla de pacientes con 5 filas y anchos variables que imitan el layout real.
+
+**Archivos migrados (inline styles → CSS Module):**
+- `src/app/dashboard/layout.tsx` — skip-to-content link (WCAG 2.4.1), wordmark `<span>` → `<a href="/dashboard">`.
+- `src/app/dashboard/layout.module.css` — `.skipLink` (off-screen → visible en focus), `.wordmark:focus-visible`, `.navLink:focus-visible`.
+- `src/app/dashboard/page.module.css` — eliminado `-webkit-overflow-scrolling: touch` (deprecado iOS 15).
+- `src/components/ui/SubmitButton.tsx` — `aria-disabled` → `aria-busy` (correcto para estado "cargando").
+- `src/app/dashboard/pacientes/page.tsx` — tabla con `scope="col"`, `role="region"`, clases CSS module, `formatFecha`.
+- `src/app/dashboard/pacientes/[pacienteId]/page.tsx` — breadcrumb semántico, `<dl>` con `.metaList`, módulos con `min-height: 44px`.
+- `src/app/dashboard/pacientes/nuevo/page.tsx` — fieldsets con `.fieldset`, labels con `.label` (flex-column reemplaza `<br />`), `.inputMono` para CURP, `.textarea` sin `cols=`.
+- `src/app/dashboard/pacientes/[pacienteId]/notas/page.tsx` — breadcrumb, tabla accesible, badges `.badgeLocked`/`.badgeDraft`, tooltip en texto truncado.
+- `src/app/dashboard/pacientes/[pacienteId]/notas/nueva/page.tsx` — sin `width: '400px'`/`'120px'`, sin `cols={70}`.
+- `src/app/dashboard/pacientes/[pacienteId]/notas/[notaId]/page.tsx` — SOAP con `.soapSection`, hash con `.hashBlock`, botón de bloqueo con `.btnPrimary` (no `background: '#c00'`).
+- `src/app/dashboard/pacientes/[pacienteId]/evaluaciones/page.tsx` — `barColor()` → OKLCH exactos (tokens), SVG con `viewBox` + `width="100%"` + `<title>`/`<desc>`, `.chartWrapper`.
+- `src/app/dashboard/pacientes/[pacienteId]/evaluaciones/nueva/page.tsx` — sin `lineHeight: '2'`, `.form`/`.fieldset`/`.select`.
+- `src/app/dashboard/pacientes/[pacienteId]/evaluaciones/[evaluacionId]/page.tsx` — SVG mini percentil con `viewBox`/`width="100%"`, `percentilColor()` → OKLCH tokens, `.metaList`/`.hashBlock`/`.backLink`.
+- `src/app/dashboard/pacientes/[pacienteId]/documentos/page.tsx` — `window.confirm()` → `ConfirmDeleteButton`, bucket nav con `.bucketTab`/`.bucketTabActive`, tabla accesible, `.uploadSection`.
+
+**Fixes sistémicos resueltos:**
+- P0: Breadcrumb `<p> + '›'` → `<nav aria-label><ol><li aria-current="page">` en 7 páginas
+- P0: `<table border={1} cellPadding={8}>` → clases CSS Module en todas las tablas
+- P0: Touch targets < 44px → `min-height: 36–44px` en todos los elementos interactivos
+- P0: `scope="col"` añadido a todos los `<th>` + `role="region" aria-labelledby tabIndex={0}` en 5 tablas
+- P1: `window.confirm()` → `<dialog>` nativo con focus trap
+- P1: SVG 640px fijo → `viewBox + width="100%"` responsive
+- P1: `cols={60–70}` / `width: '400px'` → eliminados
+- P1: `barColor()` hex `#c0392b/#e67e22/#27ae60` → OKLCH exactos del sistema de tokens
+- P1: `#c00` en botón bloquear → `.btnPrimary`
+- P2: `color: '#777'` estados vacíos → `.empty` con `var(--color-muted)`
+- P2: `fontFamily: 'monospace'` → `.inputMono` con `var(--font-mono)`
+- P3: `aria-disabled` redundante → `aria-busy`
+- P3: Wordmark `<span>` → `<a href="/dashboard">`
+- P3: Separador `›` → `<span aria-hidden="true">`
+
+**Pendiente (fuera del scope visual):**
+- Paginación en listas (P2) — requiere cambios en capa de datos Supabase (`.range()` + UI navegación).
+
+**Ramas:** Desarrollado en `claude/impecable-skill-audit-8janmr`, fusionado a `main`.
 
 ---
 

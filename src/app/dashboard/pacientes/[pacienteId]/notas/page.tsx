@@ -1,6 +1,8 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { insertAuditLog } from '@/lib/supabase/audit'
+import { formatFecha } from '@/lib/format'
+import styles from '../../pacientes.module.css'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = { title: 'Notas de Evolución — Expedientes Clínicos' }
@@ -44,79 +46,107 @@ export default async function NotasPage({
 
   return (
     <div>
-      <p style={{ fontSize: '0.85em', color: '#555' }}>
-        <a href="/dashboard/pacientes">Pacientes</a>
-        {' › '}
-        <a href={`/dashboard/pacientes/${pacienteId}`}>{nombrePaciente}</a>
-        {' › Notas de Evolución'}
-      </p>
+      <nav aria-label="Migas de pan" className={styles.breadcrumb}>
+        <ol className={styles.breadcrumbList}>
+          <li className={styles.breadcrumbItem}>
+            <a href="/dashboard/pacientes">Pacientes</a>
+          </li>
+          <li className={styles.breadcrumbItem} aria-hidden="true">
+            <span className={styles.breadcrumbSep}>›</span>
+          </li>
+          <li className={styles.breadcrumbItem}>
+            <a href={`/dashboard/pacientes/${pacienteId}`}>{nombrePaciente}</a>
+          </li>
+          <li className={styles.breadcrumbItem} aria-hidden="true">
+            <span className={styles.breadcrumbSep}>›</span>
+          </li>
+          <li className={styles.breadcrumbItem} aria-current="page">
+            Notas de Evolución
+          </li>
+        </ol>
+      </nav>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1>Notas de Evolución</h1>
-        <a href={`/dashboard/pacientes/${pacienteId}/notas/nueva`}>
+      <div className={styles.pageHeader}>
+        <h1 className={styles.pageTitle}>Notas de Evolución</h1>
+        <a href={`/dashboard/pacientes/${pacienteId}/notas/nueva`} className={styles.pageAction}>
           + Nueva Nota SOAP
         </a>
       </div>
 
       {error && (
-        <p role="alert" style={{ color: 'red', border: '1px solid red', padding: '8px' }}>
+        <p role="alert" className={styles.alert}>
           Error al cargar notas: {error.message}
         </p>
       )}
 
       {!notas || notas.length === 0 ? (
-        <p>
+        <p className={styles.empty}>
           No hay notas registradas para este paciente.{' '}
-          <a href={`/dashboard/pacientes/${pacienteId}/notas/nueva`}>
+          <a href={`/dashboard/pacientes/${pacienteId}/notas/nueva`} className={styles.tableLink}>
             Crear la primera nota.
           </a>
         </p>
       ) : (
-        <table border={1} cellPadding={8} style={{ borderCollapse: 'collapse', width: '100%' }}>
-          <thead>
-            <tr>
-              <th>Fecha</th>
-              <th>Diagnóstico CIE-11</th>
-              <th>Subjetivo (resumen)</th>
-              <th>Estado</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {notas.map((nota) => (
-              <tr key={nota.id}>
-                <td>{new Date(nota.fecha_nota).toLocaleDateString('es-MX')}</td>
-                <td>
-                  {nota.codigo_cie11
-                    ? `${nota.codigo_cie11}${nota.descripcion_cie11 ? ' — ' + nota.descripcion_cie11 : ''}`
-                    : '—'}
-                </td>
-                <td>
-                  {nota.subjetivo
-                    ? nota.subjetivo.length > 80
-                      ? nota.subjetivo.slice(0, 80) + '…'
-                      : nota.subjetivo
-                    : '—'}
-                </td>
-                <td>
-                  {nota.is_locked ? (
-                    <span style={{ color: 'red', fontWeight: 'bold' }}>Bloqueada</span>
-                  ) : (
-                    <span style={{ color: 'green' }}>Borrador</span>
-                  )}
-                </td>
-                <td>
-                  <a href={`/dashboard/pacientes/${pacienteId}/notas/${nota.id}`}>Ver</a>
-                </td>
+        <div
+          className={styles.tableWrapper}
+          role="region"
+          aria-labelledby="tabla-notas-titulo"
+          tabIndex={0}
+        >
+          <span id="tabla-notas-titulo" className="sr-only">Lista de notas de evolución</span>
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th scope="col" className={styles.th}>Fecha</th>
+                <th scope="col" className={styles.th}>Diagnóstico CIE-11</th>
+                <th scope="col" className={styles.th}>Subjetivo (resumen)</th>
+                <th scope="col" className={styles.th}>Estado</th>
+                <th scope="col" className={styles.th}>Acciones</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {notas.map((nota) => {
+                const resumen = nota.subjetivo
+                  ? nota.subjetivo.length > 80
+                    ? nota.subjetivo.slice(0, 80) + '…'
+                    : nota.subjetivo
+                  : '—'
+                return (
+                  <tr key={nota.id} className={styles.tr}>
+                    <td className={styles.td}>{formatFecha(nota.fecha_nota)}</td>
+                    <td className={styles.td}>
+                      {nota.codigo_cie11
+                        ? `${nota.codigo_cie11}${nota.descripcion_cie11 ? ' — ' + nota.descripcion_cie11 : ''}`
+                        : '—'}
+                    </td>
+                    <td className={styles.td} title={nota.subjetivo ?? undefined}>{resumen}</td>
+                    <td className={styles.td}>
+                      {nota.is_locked ? (
+                        <span className={`${styles.badge} ${styles.badgeLocked}`}>Bloqueada</span>
+                      ) : (
+                        <span className={`${styles.badge} ${styles.badgeDraft}`}>Borrador</span>
+                      )}
+                    </td>
+                    <td className={`${styles.td} ${styles.actionsCell}`}>
+                      <a
+                        href={`/dashboard/pacientes/${pacienteId}/notas/${nota.id}`}
+                        className={styles.tableLink}
+                      >
+                        Ver
+                      </a>
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
       )}
 
-      <p style={{ marginTop: '16px' }}>
-        <a href={`/dashboard/pacientes/${pacienteId}`}>← Volver al expediente</a>
-      </p>
+      <a href={`/dashboard/pacientes/${pacienteId}`} className={styles.backLink}>
+        <span aria-hidden="true">←</span>
+        <span>Volver al expediente</span>
+      </a>
     </div>
   )
 }

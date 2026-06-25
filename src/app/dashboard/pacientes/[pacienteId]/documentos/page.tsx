@@ -2,6 +2,9 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { listDocumentos, type BucketId } from '@/lib/storage'
 import { subirDocumento, eliminarDocumento } from './actions'
+import { ConfirmDeleteButton } from '@/components/ui/ConfirmDeleteButton'
+import { formatFecha } from '@/lib/format'
+import styles from '../../pacientes.module.css'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = { title: 'Documentos — Expedientes Clínicos' }
@@ -54,121 +57,126 @@ export default async function DocumentosPage({
 
   return (
     <div>
-      <p style={{ fontSize: '0.85em', color: '#555' }}>
-        <a href="/dashboard/pacientes">Pacientes</a>
-        {' › '}
-        <a href={`/dashboard/pacientes/${pacienteId}`}>{nombrePaciente}</a>
-        {' › '}
-        Documentos
-      </p>
+      <nav aria-label="Migas de pan" className={styles.breadcrumb}>
+        <ol className={styles.breadcrumbList}>
+          <li className={styles.breadcrumbItem}>
+            <a href="/dashboard/pacientes">Pacientes</a>
+          </li>
+          <li className={styles.breadcrumbItem} aria-hidden="true">
+            <span className={styles.breadcrumbSep}>›</span>
+          </li>
+          <li className={styles.breadcrumbItem}>
+            <a href={`/dashboard/pacientes/${pacienteId}`}>{nombrePaciente}</a>
+          </li>
+          <li className={styles.breadcrumbItem} aria-hidden="true">
+            <span className={styles.breadcrumbSep}>›</span>
+          </li>
+          <li className={styles.breadcrumbItem} aria-current="page">
+            Documentos
+          </li>
+        </ol>
+      </nav>
 
-      <h1>Documentos Adjuntos</h1>
+      <h1 className={styles.pageTitle}>Documentos Adjuntos</h1>
 
       {error && (
-        <p role="alert" style={{ color: 'red', border: '1px solid red', padding: '8px' }}>
+        <p role="alert" className={styles.alert}>
           {decodeURIComponent(error)}
         </p>
       )}
 
-      <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+      <nav aria-label="Secciones de documentos" className={styles.bucketNav}>
         {BUCKETS.map((b) => (
           <a
             key={b.id}
             href={`/dashboard/pacientes/${pacienteId}/documentos?bucket=${b.id}`}
-            style={{
-              padding: '6px 14px',
-              border: '1px solid #ccc',
-              borderRadius: '4px',
-              textDecoration: 'none',
-              backgroundColor: activeBucket === b.id ? '#0070f3' : '#fff',
-              color: activeBucket === b.id ? '#fff' : '#000',
-            }}
+            className={`${styles.bucketTab} ${activeBucket === b.id ? styles.bucketTabActive : styles.bucketTabInactive}`}
+            aria-current={activeBucket === b.id ? 'page' : undefined}
           >
             {b.label}
           </a>
         ))}
-      </div>
+      </nav>
 
-      <h2 style={{ fontSize: '1em', marginBottom: '8px' }}>
-        Subir documento ({activeBucket === 'reportes-escaneados' ? 'PDF, JPEG, PNG, WEBP — máx. 20 MB' : 'PDF, JPEG, PNG — máx. 10 MB'})
-      </h2>
-      <form action={subirBound} encType="multipart/form-data" style={{ marginBottom: '24px' }}>
-        <input
-          type="file"
-          name="file"
-          accept=".pdf,.jpg,.jpeg,.png,.webp"
-          required
-          style={{ marginRight: '8px' }}
-        />
-        <button type="submit" style={{ padding: '6px 14px' }}>
-          Subir
-        </button>
-      </form>
+      <section className={styles.uploadSection}>
+        <h2 className={styles.uploadLabel}>
+          Subir documento
+        </h2>
+        <p className={styles.uploadHint}>
+          {activeBucket === 'reportes-escaneados'
+            ? 'PDF, JPEG, PNG, WEBP — máx. 20 MB'
+            : 'PDF, JPEG, PNG — máx. 10 MB'}
+        </p>
+        <form action={subirBound} encType="multipart/form-data" className={styles.uploadRow}>
+          <input
+            type="file"
+            name="file"
+            accept=".pdf,.jpg,.jpeg,.png,.webp"
+            required
+          />
+          <button type="submit" className={styles.btnPrimary}>Subir</button>
+        </form>
+      </section>
 
-      <h2 style={{ fontSize: '1em', marginBottom: '8px' }}>
+      <h2 className={styles.sectionHeading}>
         {BUCKETS.find((b) => b.id === activeBucket)?.label ?? ''} ({documentos?.length ?? 0})
       </h2>
 
       {!documentos || documentos.length === 0 ? (
-        <p style={{ color: '#777' }}>No hay documentos en esta sección.</p>
+        <p className={styles.empty}>No hay documentos en esta sección.</p>
       ) : (
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9em' }}>
-          <thead>
-            <tr style={{ borderBottom: '2px solid #ccc', textAlign: 'left' }}>
-              <th style={{ padding: '6px 8px' }}>Archivo</th>
-              <th style={{ padding: '6px 8px' }}>Tamaño</th>
-              <th style={{ padding: '6px 8px' }}>Fecha</th>
-              <th style={{ padding: '6px 8px' }}>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {documentos.map((doc) => {
-              const eliminarBound = eliminarDocumento.bind(null, pacienteId, activeBucket, doc.path)
-              const displayName = doc.name.replace(/^\d+-/, '')
-              return (
-                <tr key={doc.path} style={{ borderBottom: '1px solid #eee' }}>
-                  <td style={{ padding: '6px 8px' }}>{displayName}</td>
-                  <td style={{ padding: '6px 8px' }}>{formatBytes(doc.size)}</td>
-                  <td style={{ padding: '6px 8px' }}>
-                    {doc.createdAt
-                      ? new Date(doc.createdAt).toLocaleDateString('es-MX')
-                      : '—'}
-                  </td>
-                  <td style={{ padding: '6px 8px', display: 'flex', gap: '8px', alignItems: 'center' }}>
-                    {doc.signedUrl && (
-                      <a
-                        href={doc.signedUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{ color: '#0070f3' }}
-                      >
-                        Descargar
-                      </a>
-                    )}
-                    <form action={eliminarBound}>
-                      <button
-                        type="submit"
-                        style={{ color: 'red', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-                        onClick={(e) => {
-                          if (!confirm(`¿Eliminar "${displayName}"? Esta acción no se puede deshacer.`)) {
-                            e.preventDefault()
-                          }
-                        }}
-                      >
-                        Eliminar
-                      </button>
-                    </form>
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
+        <div
+          className={styles.tableWrapper}
+          role="region"
+          aria-labelledby="tabla-docs-titulo"
+          tabIndex={0}
+        >
+          <span id="tabla-docs-titulo" className="sr-only">Lista de documentos adjuntos</span>
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th scope="col" className={styles.th}>Archivo</th>
+                <th scope="col" className={styles.th}>Tamaño</th>
+                <th scope="col" className={styles.th}>Fecha</th>
+                <th scope="col" className={styles.th}>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {documentos.map((doc) => {
+                const eliminarBound = eliminarDocumento.bind(null, pacienteId, activeBucket, doc.path)
+                const displayName = doc.name.replace(/^\d+-/, '')
+                return (
+                  <tr key={doc.path} className={styles.tr}>
+                    <td className={styles.td}>{displayName}</td>
+                    <td className={styles.td}>{formatBytes(doc.size)}</td>
+                    <td className={styles.td}>
+                      {doc.createdAt ? formatFecha(doc.createdAt) : '—'}
+                    </td>
+                    <td className={`${styles.td} ${styles.actionsCell}`}>
+                      {doc.signedUrl && (
+                        <a
+                          href={doc.signedUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={styles.tableAction}
+                        >
+                          Descargar
+                        </a>
+                      )}
+                      <ConfirmDeleteButton action={eliminarBound} fileName={displayName} />
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
       )}
 
-      <p style={{ marginTop: '24px' }}>
-        <a href={`/dashboard/pacientes/${pacienteId}`}>← Volver al expediente</a>
-      </p>
+      <a href={`/dashboard/pacientes/${pacienteId}`} className={styles.backLink}>
+        <span aria-hidden="true">←</span>
+        <span>Volver al expediente</span>
+      </a>
     </div>
   )
 }

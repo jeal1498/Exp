@@ -2,6 +2,8 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { bloquearNota } from './actions'
 import { insertAuditLog } from '@/lib/supabase/audit'
+import { formatFecha, formatFechaHora } from '@/lib/format'
+import styles from '../../../pacientes.module.css'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = { title: 'Nota de Evolución — Expedientes Clínicos' }
@@ -53,162 +55,152 @@ export default async function NotaDetallePage({
 
   return (
     <div>
-      <p style={{ fontSize: '0.85em', color: '#555' }}>
-        <a href="/dashboard/pacientes">Pacientes</a>
-        {' › '}
-        <a href={`/dashboard/pacientes/${pacienteId}`}>{nombrePaciente}</a>
-        {' › '}
-        <a href={`/dashboard/pacientes/${pacienteId}/notas`}>Notas de Evolución</a>
-        {' › Nota'}
-      </p>
+      <nav aria-label="Migas de pan" className={styles.breadcrumb}>
+        <ol className={styles.breadcrumbList}>
+          <li className={styles.breadcrumbItem}>
+            <a href="/dashboard/pacientes">Pacientes</a>
+          </li>
+          <li className={styles.breadcrumbItem} aria-hidden="true">
+            <span className={styles.breadcrumbSep}>›</span>
+          </li>
+          <li className={styles.breadcrumbItem}>
+            <a href={`/dashboard/pacientes/${pacienteId}`}>{nombrePaciente}</a>
+          </li>
+          <li className={styles.breadcrumbItem} aria-hidden="true">
+            <span className={styles.breadcrumbSep}>›</span>
+          </li>
+          <li className={styles.breadcrumbItem}>
+            <a href={`/dashboard/pacientes/${pacienteId}/notas`}>Notas de Evolución</a>
+          </li>
+          <li className={styles.breadcrumbItem} aria-hidden="true">
+            <span className={styles.breadcrumbSep}>›</span>
+          </li>
+          <li className={styles.breadcrumbItem} aria-current="page">
+            Nota
+          </li>
+        </ol>
+      </nav>
 
       {sp.error && (
-        <p role="alert" style={{ color: 'red', border: '1px solid red', padding: '8px' }}>
+        <p role="alert" className={styles.alert}>
           {decodeURIComponent(sp.error)}
         </p>
       )}
 
       {(error || !nota) && (
-        <p role="alert" style={{ color: 'red', border: '1px solid red', padding: '8px' }}>
+        <p role="alert" className={styles.alert}>
           Nota no encontrada o sin acceso.
         </p>
       )}
 
       {nota && (
         <>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <h1>Nota de Evolución</h1>
+          <div className={styles.pageHeader}>
+            <h1 className={styles.pageTitle}>Nota de Evolución</h1>
             {nota.is_locked ? (
-              <span
-                style={{
-                  background: '#fee',
-                  color: 'red',
-                  border: '1px solid red',
-                  padding: '2px 8px',
-                  fontWeight: 'bold',
-                  fontSize: '0.9em',
-                }}
-              >
-                BLOQUEADA — NOM-004 Art. 9
-              </span>
+              <span className={`${styles.badge} ${styles.badgeLocked}`}>BLOQUEADA — NOM-004 Art. 9</span>
             ) : (
-              <span
-                style={{
-                  background: '#efe',
-                  color: 'green',
-                  border: '1px solid green',
-                  padding: '2px 8px',
-                  fontSize: '0.9em',
-                }}
-              >
-                BORRADOR
-              </span>
+              <span className={`${styles.badge} ${styles.badgeDraft}`}>BORRADOR</span>
             )}
           </div>
 
-          <dl style={{ lineHeight: '1.8' }}>
-            <dt><strong>Fecha de la nota</strong></dt>
-            <dd>{new Date(nota.fecha_nota).toLocaleString('es-MX')}</dd>
+          <dl className={styles.metaList}>
+            <dt className={styles.metaLabel}>Fecha de la nota</dt>
+            <dd className={styles.metaValue}>{formatFechaHora(nota.fecha_nota)}</dd>
 
             {nota.codigo_cie11 && (
               <>
-                <dt><strong>Código CIE-11</strong></dt>
-                <dd><code>{nota.codigo_cie11}</code></dd>
+                <dt className={styles.metaLabel}>Código CIE-11</dt>
+                <dd className={`${styles.metaValue} ${styles.metaValueMono}`}>{nota.codigo_cie11}</dd>
               </>
             )}
 
             {nota.descripcion_cie11 && (
               <>
-                <dt><strong>Diagnóstico</strong></dt>
-                <dd>{nota.descripcion_cie11}</dd>
+                <dt className={styles.metaLabel}>Diagnóstico</dt>
+                <dd className={styles.metaValue}>{nota.descripcion_cie11}</dd>
               </>
             )}
           </dl>
 
-          <hr />
+          <hr className={styles.divider} />
 
-          <h2>Nota SOAP</h2>
+          <h2 className={styles.sectionHeading}>Nota SOAP</h2>
 
-          <section style={{ marginBottom: '16px' }}>
-            <h3>S — Subjetivo</h3>
-            <p style={{ whiteSpace: 'pre-wrap' }}>{nota.subjetivo ?? <em>No registrado</em>}</p>
+          <section className={styles.soapSection}>
+            <h3 className={styles.soapHeading}>S — Subjetivo</h3>
+            {nota.subjetivo
+              ? <p className={styles.soapContent}>{nota.subjetivo}</p>
+              : <p className={styles.soapEmpty}>No registrado</p>
+            }
           </section>
 
-          <section style={{ marginBottom: '16px' }}>
-            <h3>O — Objetivo</h3>
-            <p style={{ whiteSpace: 'pre-wrap' }}>{nota.objetivo ?? <em>No registrado</em>}</p>
+          <section className={styles.soapSection}>
+            <h3 className={styles.soapHeading}>O — Objetivo</h3>
+            {nota.objetivo
+              ? <p className={styles.soapContent}>{nota.objetivo}</p>
+              : <p className={styles.soapEmpty}>No registrado</p>
+            }
           </section>
 
-          <section style={{ marginBottom: '16px' }}>
-            <h3>A — Análisis</h3>
-            <p style={{ whiteSpace: 'pre-wrap' }}>{nota.analisis ?? <em>No registrado</em>}</p>
+          <section className={styles.soapSection}>
+            <h3 className={styles.soapHeading}>A — Análisis</h3>
+            {nota.analisis
+              ? <p className={styles.soapContent}>{nota.analisis}</p>
+              : <p className={styles.soapEmpty}>No registrado</p>
+            }
           </section>
 
-          <section style={{ marginBottom: '16px' }}>
-            <h3>P — Plan</h3>
-            <p style={{ whiteSpace: 'pre-wrap' }}>{nota.plan ?? <em>No registrado</em>}</p>
+          <section className={styles.soapSection}>
+            <h3 className={styles.soapHeading}>P — Plan</h3>
+            {nota.plan
+              ? <p className={styles.soapContent}>{nota.plan}</p>
+              : <p className={styles.soapEmpty}>No registrado</p>
+            }
           </section>
 
-          <hr />
+          <hr className={styles.divider} />
 
-          <h2>Inalterabilidad (NOM-004 Art. 9 / NOM-024)</h2>
+          <h2 className={styles.sectionHeading}>Inalterabilidad (NOM-004 Art. 9 / NOM-024)</h2>
 
           {nota.is_locked ? (
-            <dl style={{ lineHeight: '1.8' }}>
-              <dt><strong>Bloqueada el</strong></dt>
-              <dd>{new Date(nota.locked_at!).toLocaleString('es-MX')}</dd>
+            <dl className={styles.metaList}>
+              <dt className={styles.metaLabel}>Bloqueada el</dt>
+              <dd className={styles.metaValue}>{formatFechaHora(nota.locked_at!)}</dd>
 
-              <dt><strong>Hash de integridad SHA-256 (NOM-024)</strong></dt>
-              <dd>
-                <code
-                  style={{
-                    display: 'block',
-                    wordBreak: 'break-all',
-                    background: '#f5f5f5',
-                    padding: '8px',
-                    fontSize: '0.85em',
-                  }}
-                >
-                  {nota.hash_integridad}
-                </code>
+              <dt className={styles.metaLabel}>Hash de integridad SHA-256 (NOM-024)</dt>
+              <dd className={styles.metaValue}>
+                <code className={styles.hashBlock}>{nota.hash_integridad}</code>
               </dd>
             </dl>
           ) : (
             <div>
-              <p style={{ color: '#555', fontSize: '0.9em' }}>
+              <p className={styles.lockWarning}>
                 Una vez bloqueada, la nota no puede modificarse (NOM-004 Art. 9).
                 El sistema generará un hash SHA-256 del contenido para garantizar su integridad (NOM-024).
               </p>
               <form action={bloquearNotaBound}>
-                <button
-                  type="submit"
-                  style={{
-                    background: '#c00',
-                    color: '#fff',
-                    border: 'none',
-                    padding: '8px 16px',
-                    cursor: 'pointer',
-                  }}
-                >
+                <button type="submit" className={styles.btnPrimary}>
                   Bloquear Nota (acción irreversible)
                 </button>
               </form>
             </div>
           )}
 
-          <hr />
+          <hr className={styles.divider} />
 
-          <dl style={{ lineHeight: '1.8', fontSize: '0.85em', color: '#555' }}>
-            <dt><strong>Creada</strong></dt>
-            <dd>{new Date(nota.created_at).toLocaleString('es-MX')}</dd>
+          <dl className={`${styles.metaList} ${styles.auditMeta}`}>
+            <dt className={styles.metaLabel}>Creada</dt>
+            <dd className={styles.metaValue}>{formatFechaHora(nota.created_at)}</dd>
 
-            <dt><strong>Última modificación</strong></dt>
-            <dd>{new Date(nota.updated_at).toLocaleString('es-MX')}</dd>
+            <dt className={styles.metaLabel}>Última modificación</dt>
+            <dd className={styles.metaValue}>{formatFechaHora(nota.updated_at)}</dd>
           </dl>
 
-          <p style={{ marginTop: '16px' }}>
-            <a href={`/dashboard/pacientes/${pacienteId}/notas`}>← Volver a la lista de notas</a>
-          </p>
+          <a href={`/dashboard/pacientes/${pacienteId}/notas`} className={styles.backLink}>
+            <span aria-hidden="true">←</span>
+            <span>Volver a la lista de notas</span>
+          </a>
         </>
       )}
     </div>

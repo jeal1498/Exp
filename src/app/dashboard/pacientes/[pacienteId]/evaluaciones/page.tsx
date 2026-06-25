@@ -1,6 +1,8 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { insertAuditLog } from '@/lib/supabase/audit'
+import { formatFecha } from '@/lib/format'
+import styles from '../../pacientes.module.css'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = { title: 'Evaluaciones Neuropsicológicas — Expedientes Clínicos' }
@@ -18,10 +20,17 @@ const DOMINIOS_LABEL: Record<string, string> = {
 
 const DOMINIOS_ORDER = Object.keys(DOMINIOS_LABEL)
 
-function barColor(percentil: number): string {
-  if (percentil < 25) return '#c0392b'
-  if (percentil < 75) return '#e67e22'
-  return '#27ae60'
+// Returns OKLCH values matching design tokens exactly
+function barColorVar(percentil: number): string {
+  if (percentil < 25) return 'oklch(0.430 0.155 22)'   // --color-error
+  if (percentil < 75) return 'oklch(0.560 0.095 55)'   // --color-compliance
+  return 'oklch(0.430 0.130 155)'                       // --color-success
+}
+
+function percentilClass(percentil: number): string {
+  if (percentil < 25) return styles.percentilLow
+  if (percentil < 75) return styles.percentilMid
+  return styles.percentilHigh
 }
 
 export default async function EvaluacionesPage({
@@ -73,7 +82,7 @@ export default async function EvaluacionesPage({
     }
   }
 
-  // SVG chart constants
+  // SVG chart constants — viewBox-based for responsive scaling
   const svgW = 640
   const svgH = 200
   const padL = 30
@@ -87,165 +96,211 @@ export default async function EvaluacionesPage({
 
   return (
     <div>
-      <p style={{ fontSize: '0.85em', color: '#555' }}>
-        <a href="/dashboard/pacientes">Pacientes</a>
-        {' › '}
-        <a href={`/dashboard/pacientes/${pacienteId}`}>{nombrePaciente}</a>
-        {' › Evaluaciones Neuropsicológicas'}
-      </p>
+      <nav aria-label="Migas de pan" className={styles.breadcrumb}>
+        <ol className={styles.breadcrumbList}>
+          <li className={styles.breadcrumbItem}>
+            <a href="/dashboard/pacientes">Pacientes</a>
+          </li>
+          <li className={styles.breadcrumbItem} aria-hidden="true">
+            <span className={styles.breadcrumbSep}>›</span>
+          </li>
+          <li className={styles.breadcrumbItem}>
+            <a href={`/dashboard/pacientes/${pacienteId}`}>{nombrePaciente}</a>
+          </li>
+          <li className={styles.breadcrumbItem} aria-hidden="true">
+            <span className={styles.breadcrumbSep}>›</span>
+          </li>
+          <li className={styles.breadcrumbItem} aria-current="page">
+            Evaluaciones Neuropsicológicas
+          </li>
+        </ol>
+      </nav>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h1>Evaluaciones Neuropsicológicas</h1>
-        <a href={`/dashboard/pacientes/${pacienteId}/evaluaciones/nueva`}>
+      <div className={styles.pageHeader}>
+        <h1 className={styles.pageTitle}>Evaluaciones Neuropsicológicas</h1>
+        <a href={`/dashboard/pacientes/${pacienteId}/evaluaciones/nueva`} className={styles.pageAction}>
           + Nueva Evaluación
         </a>
       </div>
 
       {error && (
-        <p role="alert" style={{ color: 'red', border: '1px solid red', padding: '8px' }}>
+        <p role="alert" className={styles.alert}>
           Error al cargar evaluaciones: {error.message}
         </p>
       )}
 
       {!evaluaciones || evaluaciones.length === 0 ? (
-        <p>
+        <p className={styles.empty}>
           No hay evaluaciones registradas para este paciente.{' '}
-          <a href={`/dashboard/pacientes/${pacienteId}/evaluaciones/nueva`}>
+          <a href={`/dashboard/pacientes/${pacienteId}/evaluaciones/nueva`} className={styles.tableLink}>
             Registrar la primera evaluación.
           </a>
         </p>
       ) : (
         <>
-          <table border={1} cellPadding={8} style={{ borderCollapse: 'collapse', width: '100%' }}>
-            <thead>
-              <tr>
-                <th>Fecha</th>
-                <th>Prueba</th>
-                <th>Dominio</th>
-                <th>Puntaje bruto</th>
-                <th>Percentil</th>
-                <th>Puntaje estándar</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {evaluaciones.map((ev) => (
-                <tr key={ev.id}>
-                  <td>{new Date(ev.fecha_evaluacion).toLocaleDateString('es-MX')}</td>
-                  <td>{ev.nombre_prueba}</td>
-                  <td>{ev.dominio}</td>
-                  <td style={{ textAlign: 'right' }}>{ev.puntaje_bruto ?? '—'}</td>
-                  <td style={{ textAlign: 'right' }}>
-                    {ev.percentil !== null && ev.percentil !== undefined ? (
-                      <span style={{
-                        color: barColor(ev.percentil),
-                        fontWeight: 'bold',
-                      }}>
-                        {ev.percentil}
-                      </span>
-                    ) : '—'}
-                  </td>
-                  <td style={{ textAlign: 'right' }}>{ev.puntuacion_estandar ?? '—'}</td>
-                  <td>
-                    <a href={`/dashboard/pacientes/${pacienteId}/evaluaciones/${ev.id}`}>Ver</a>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-          <h2 style={{ marginTop: '32px' }}>Perfil de Rendimiento Cognitivo (percentil máximo por dominio)</h2>
-          <p style={{ fontSize: '0.85em', color: '#555' }}>
-            <span style={{ color: '#c0392b' }}>■</span> Bajo (&lt;25) &nbsp;
-            <span style={{ color: '#e67e22' }}>■</span> Medio (25–74) &nbsp;
-            <span style={{ color: '#27ae60' }}>■</span> Alto (≥75)
-          </p>
-
-          <svg
-            width={svgW}
-            height={svgH}
-            style={{ fontFamily: 'sans-serif', fontSize: '11px', overflow: 'visible' }}
-            role="img"
-            aria-label="Gráfico de rendimiento cognitivo por dominio"
+          <div
+            className={styles.tableWrapper}
+            role="region"
+            aria-labelledby="tabla-evaluaciones-titulo"
+            tabIndex={0}
           >
-            {/* Reference lines */}
-            {[25, 50, 75].map((val) => {
-              const y = padT + chartH - (val / 100) * chartH
-              return (
-                <g key={val}>
-                  <line
-                    x1={padL} y1={y} x2={padL + chartW} y2={y}
-                    stroke="#ccc" strokeWidth={1} strokeDasharray="4 3"
-                  />
-                  <text x={padL - 4} y={y + 4} textAnchor="end" fill="#999">{val}</text>
-                </g>
-              )
-            })}
-            {/* Baseline */}
-            <line x1={padL} y1={padT + chartH} x2={padL + chartW} y2={padT + chartH} stroke="#555" strokeWidth={1} />
+            <span id="tabla-evaluaciones-titulo" className="sr-only">Lista de evaluaciones neuropsicológicas</span>
+            <table className={styles.table}>
+              <thead>
+                <tr>
+                  <th scope="col" className={styles.th}>Fecha</th>
+                  <th scope="col" className={styles.th}>Prueba</th>
+                  <th scope="col" className={styles.th}>Dominio</th>
+                  <th scope="col" className={`${styles.th} ${styles.thNumeric}`}>Puntaje bruto</th>
+                  <th scope="col" className={`${styles.th} ${styles.thNumeric}`}>Percentil</th>
+                  <th scope="col" className={`${styles.th} ${styles.thNumeric}`}>Puntaje estándar</th>
+                  <th scope="col" className={styles.th}>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {evaluaciones.map((ev) => (
+                  <tr key={ev.id} className={styles.tr}>
+                    <td className={styles.td}>{formatFecha(ev.fecha_evaluacion)}</td>
+                    <td className={styles.td}>{ev.nombre_prueba}</td>
+                    <td className={styles.td}>{ev.dominio}</td>
+                    <td className={`${styles.td} ${styles.tdNumeric}`}>{ev.puntaje_bruto ?? '—'}</td>
+                    <td className={`${styles.td} ${styles.tdNumeric}`}>
+                      {ev.percentil !== null && ev.percentil !== undefined ? (
+                        <span className={percentilClass(ev.percentil)}>
+                          {ev.percentil}
+                        </span>
+                      ) : '—'}
+                    </td>
+                    <td className={`${styles.td} ${styles.tdNumeric}`}>{ev.puntuacion_estandar ?? '—'}</td>
+                    <td className={`${styles.td} ${styles.actionsCell}`}>
+                      <a
+                        href={`/dashboard/pacientes/${pacienteId}/evaluaciones/${ev.id}`}
+                        className={styles.tableLink}
+                      >
+                        Ver
+                      </a>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
-            {/* Bars */}
-            {DOMINIOS_ORDER.map((dominio, i) => {
-              const slotW = chartW / n
-              const x = padL + i * slotW + (slotW - barW) / 2
-              const val = maxPercentilPorDominio[dominio]
-              const barH = val !== null ? (val / 100) * chartH : 0
-              const y = padT + chartH - barH
-              const label = DOMINIOS_LABEL[dominio]
+          <h2 className={styles.sectionHeading}>Perfil de Rendimiento Cognitivo (percentil máximo por dominio)</h2>
 
-              return (
-                <g key={dominio}>
-                  {val !== null ? (
-                    <rect
-                      x={x} y={y} width={barW} height={barH}
-                      fill={barColor(val)}
-                      opacity={0.85}
+          <div className={styles.chartLegend}>
+            <span className={styles.chartLegendItem}>
+              <span className={styles.percentilLow} aria-hidden="true">■</span> Bajo (&lt;25)
+            </span>
+            <span className={styles.chartLegendItem}>
+              <span className={styles.percentilMid} aria-hidden="true">■</span> Medio (25–74)
+            </span>
+            <span className={styles.chartLegendItem}>
+              <span className={styles.percentilHigh} aria-hidden="true">■</span> Alto (≥75)
+            </span>
+          </div>
+
+          <div className={styles.chartWrapper}>
+            <svg
+              viewBox={`0 0 ${svgW} ${svgH}`}
+              width="100%"
+              style={{ fontFamily: 'var(--font-sans)', fontSize: '11px', overflow: 'visible' }}
+              role="img"
+              aria-labelledby="chart-title chart-desc"
+            >
+              <title id="chart-title">Perfil de rendimiento cognitivo por dominio</title>
+              <desc id="chart-desc">
+                Gráfico de barras con el percentil máximo registrado por dominio cognitivo: {
+                  DOMINIOS_ORDER
+                    .filter(d => maxPercentilPorDominio[d] !== null)
+                    .map(d => `${d}: ${maxPercentilPorDominio[d]}`)
+                    .join(', ') || 'sin datos disponibles'
+                }
+              </desc>
+
+              {/* Reference lines */}
+              {[25, 50, 75].map((val) => {
+                const y = padT + chartH - (val / 100) * chartH
+                return (
+                  <g key={val}>
+                    <line
+                      x1={padL} y1={y} x2={padL + chartW} y2={y}
+                      stroke="oklch(0.850 0.000 0)" strokeWidth={1} strokeDasharray="4 3"
                     />
-                  ) : (
-                    <rect
-                      x={x} y={padT} width={barW} height={chartH}
-                      fill="#eee" stroke="#ccc" strokeWidth={1}
-                    />
-                  )}
-                  {val !== null && (
+                    <text x={padL - 4} y={y + 4} textAnchor="end" fill="oklch(0.600 0.000 0)">{val}</text>
+                  </g>
+                )
+              })}
+              {/* Baseline */}
+              <line
+                x1={padL} y1={padT + chartH} x2={padL + chartW} y2={padT + chartH}
+                stroke="oklch(0.400 0.000 0)" strokeWidth={1}
+              />
+
+              {/* Bars */}
+              {DOMINIOS_ORDER.map((dominio, i) => {
+                const slotW = chartW / n
+                const x = padL + i * slotW + (slotW - barW) / 2
+                const val = maxPercentilPorDominio[dominio]
+                const barH = val !== null ? (val / 100) * chartH : 0
+                const y = padT + chartH - barH
+                const label = DOMINIOS_LABEL[dominio]
+
+                return (
+                  <g key={dominio}>
+                    {val !== null ? (
+                      <rect
+                        x={x} y={y} width={barW} height={barH}
+                        fill={barColorVar(val)}
+                        opacity={0.85}
+                      />
+                    ) : (
+                      <rect
+                        x={x} y={padT} width={barW} height={chartH}
+                        fill="oklch(0.950 0.000 0)" stroke="oklch(0.850 0.000 0)" strokeWidth={1}
+                      />
+                    )}
+                    {val !== null && (
+                      <text
+                        x={x + barW / 2}
+                        y={y - 3}
+                        textAnchor="middle"
+                        fill="oklch(0.300 0.000 0)"
+                      >
+                        {val}
+                      </text>
+                    )}
+                    {val === null && (
+                      <text
+                        x={x + barW / 2}
+                        y={padT + chartH / 2 + 4}
+                        textAnchor="middle"
+                        fill="oklch(0.700 0.000 0)"
+                        fontSize={9}
+                      >
+                        —
+                      </text>
+                    )}
                     <text
                       x={x + barW / 2}
-                      y={y - 3}
+                      y={padT + chartH + 16}
                       textAnchor="middle"
-                      fill="#333"
+                      fill="oklch(0.400 0.000 0)"
                     >
-                      {val}
+                      {label}
                     </text>
-                  )}
-                  {val === null && (
-                    <text
-                      x={x + barW / 2}
-                      y={padT + chartH / 2 + 4}
-                      textAnchor="middle"
-                      fill="#aaa"
-                      fontSize={9}
-                    >
-                      —
-                    </text>
-                  )}
-                  <text
-                    x={x + barW / 2}
-                    y={padT + chartH + 16}
-                    textAnchor="middle"
-                    fill="#555"
-                  >
-                    {label}
-                  </text>
-                </g>
-              )
-            })}
-          </svg>
+                  </g>
+                )
+              })}
+            </svg>
+          </div>
         </>
       )}
 
-      <p style={{ marginTop: '16px' }}>
-        <a href={`/dashboard/pacientes/${pacienteId}`}>← Volver al expediente</a>
-      </p>
+      <a href={`/dashboard/pacientes/${pacienteId}`} className={styles.backLink}>
+        <span aria-hidden="true">←</span>
+        <span>Volver al expediente</span>
+      </a>
     </div>
   )
 }

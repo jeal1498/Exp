@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { crearNota } from './actions'
+import styles from '../../../pacientes.module.css'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = { title: 'Nueva Nota de Evolución — Expedientes Clínicos' }
@@ -54,54 +55,70 @@ export default async function NuevaNotaPage({
 
   return (
     <div>
-      <p style={{ fontSize: '0.85em', color: '#555' }}>
-        <a href="/dashboard/pacientes">Pacientes</a>
-        {' › '}
-        <a href={`/dashboard/pacientes/${pacienteId}`}>{nombrePaciente}</a>
-        {' › '}
-        <a href={`/dashboard/pacientes/${pacienteId}/notas`}>Notas de Evolución</a>
-        {' › Nueva Nota'}
-      </p>
+      <nav aria-label="Migas de pan" className={styles.breadcrumb}>
+        <ol className={styles.breadcrumbList}>
+          <li className={styles.breadcrumbItem}>
+            <a href="/dashboard/pacientes">Pacientes</a>
+          </li>
+          <li className={styles.breadcrumbItem} aria-hidden="true">
+            <span className={styles.breadcrumbSep}>›</span>
+          </li>
+          <li className={styles.breadcrumbItem}>
+            <a href={`/dashboard/pacientes/${pacienteId}`}>{nombrePaciente}</a>
+          </li>
+          <li className={styles.breadcrumbItem} aria-hidden="true">
+            <span className={styles.breadcrumbSep}>›</span>
+          </li>
+          <li className={styles.breadcrumbItem}>
+            <a href={`/dashboard/pacientes/${pacienteId}/notas`}>Notas de Evolución</a>
+          </li>
+          <li className={styles.breadcrumbItem} aria-hidden="true">
+            <span className={styles.breadcrumbSep}>›</span>
+          </li>
+          <li className={styles.breadcrumbItem} aria-current="page">
+            Nueva Nota
+          </li>
+        </ol>
+      </nav>
 
-      <h1>Nueva Nota de Evolución</h1>
-      <p style={{ fontSize: '0.85em', color: '#555' }}>
-        Campos marcados con <abbr title="obligatorio">*</abbr> son requeridos.
+      <h1 className={styles.pageTitle}>Nueva Nota de Evolución</h1>
+      <p className={styles.helperText}>
+        Campos marcados con <abbr title="obligatorio"><span className={styles.required}>*</span></abbr> son requeridos.
         Al menos un campo SOAP debe completarse.
       </p>
 
       {sp.error && (
-        <p role="alert" style={{ color: 'red', border: '1px solid red', padding: '8px' }}>
+        <p role="alert" className={styles.alert}>
           {decodeURIComponent(sp.error)}
         </p>
       )}
 
-      <form action={crearNotaBound}>
-        <fieldset>
+      <form action={crearNotaBound} className={styles.form}>
+        <fieldset className={styles.fieldset}>
           <legend>Fecha y diagnóstico</legend>
 
-          <div>
-            <label>
-              Fecha y hora de la nota * <span style={{ fontSize: '0.8em' }}>(hora en zona local de México)</span>
-              <br />
+          <div className={styles.fieldGroup}>
+            <label className={styles.label}>
+              <span>Fecha y hora de la nota <span className={styles.required}>*</span> <span className={styles.labelHint}>(hora en zona local de México)</span></span>
               <input
                 type="datetime-local"
                 name="fecha_nota"
                 required
                 defaultValue={defaultFecha}
+                className={styles.input}
               />
             </label>
           </div>
 
-          <div style={{ marginTop: '12px' }}>
-            <label>
-              Código CIE-11
-              <br />
+          <div className={styles.fieldGroup}>
+            <label className={styles.label}>
+              <span>Código CIE-11</span>
               <input
                 type="text"
                 name="codigo_cie11"
                 list="cie11-codigos"
                 placeholder="Ej. 6D80"
-                style={{ fontFamily: 'monospace', width: '120px' }}
+                className={`${styles.inputMono} ${styles.inputNarrow}`}
               />
               <datalist id="cie11-codigos">
                 {CIE11_CODES.map((c) => (
@@ -111,16 +128,15 @@ export default async function NuevaNotaPage({
             </label>
           </div>
 
-          <div style={{ marginTop: '12px' }}>
-            <label>
-              Descripción diagnóstica (CIE-11)
-              <br />
+          <div className={styles.fieldGroup}>
+            <label className={styles.label}>
+              <span>Descripción diagnóstica (CIE-11)</span>
               <input
                 type="text"
                 name="descripcion_cie11"
                 list="cie11-descripciones"
                 placeholder="Descripción del diagnóstico"
-                style={{ width: '400px' }}
+                className={styles.input}
               />
               <datalist id="cie11-descripciones">
                 {CIE11_CODES.map((c) => (
@@ -131,46 +147,41 @@ export default async function NuevaNotaPage({
           </div>
         </fieldset>
 
-        <fieldset style={{ marginTop: '16px' }}>
+        <fieldset className={styles.fieldset}>
           <legend>Nota SOAP (NOM-004 §8) — complete al menos un campo</legend>
 
-          <div>
-            <label>
-              S — Subjetivo <span style={{ fontSize: '0.8em' }}>(motivo de consulta, síntomas referidos por el paciente)</span>
-              <br />
-              <textarea name="subjetivo" rows={4} cols={70} maxLength={2000} />
+          <div className={styles.fieldGroup}>
+            <label className={styles.label}>
+              <span>S — Subjetivo <span className={styles.labelHint}>(motivo de consulta, síntomas referidos por el paciente)</span></span>
+              <textarea name="subjetivo" rows={4} maxLength={2000} className={styles.textarea} />
             </label>
           </div>
 
-          <div style={{ marginTop: '12px' }}>
-            <label>
-              O — Objetivo <span style={{ fontSize: '0.8em' }}>(hallazgos observables, resultados de pruebas, signos)</span>
-              <br />
-              <textarea name="objetivo" rows={4} cols={70} maxLength={2000} />
+          <div className={styles.fieldGroup}>
+            <label className={styles.label}>
+              <span>O — Objetivo <span className={styles.labelHint}>(hallazgos observables, resultados de pruebas, signos)</span></span>
+              <textarea name="objetivo" rows={4} maxLength={2000} className={styles.textarea} />
             </label>
           </div>
 
-          <div style={{ marginTop: '12px' }}>
-            <label>
-              A — Análisis <span style={{ fontSize: '0.8em' }}>(interpretación clínica, diagnóstico, razonamiento)</span>
-              <br />
-              <textarea name="analisis" rows={4} cols={70} maxLength={2000} />
+          <div className={styles.fieldGroup}>
+            <label className={styles.label}>
+              <span>A — Análisis <span className={styles.labelHint}>(interpretación clínica, diagnóstico, razonamiento)</span></span>
+              <textarea name="analisis" rows={4} maxLength={2000} className={styles.textarea} />
             </label>
           </div>
 
-          <div style={{ marginTop: '12px' }}>
-            <label>
-              P — Plan <span style={{ fontSize: '0.8em' }}>(intervenciones, seguimiento, indicaciones)</span>
-              <br />
-              <textarea name="plan" rows={4} cols={70} maxLength={2000} />
+          <div className={styles.fieldGroup}>
+            <label className={styles.label}>
+              <span>P — Plan <span className={styles.labelHint}>(intervenciones, seguimiento, indicaciones)</span></span>
+              <textarea name="plan" rows={4} maxLength={2000} className={styles.textarea} />
             </label>
           </div>
         </fieldset>
 
-        <div style={{ marginTop: '16px' }}>
-          <button type="submit">Guardar nota</button>
-          <span> · </span>
-          <a href={`/dashboard/pacientes/${pacienteId}/notas`}>Cancelar</a>
+        <div className={styles.formActions}>
+          <button type="submit" className={styles.btnPrimary}>Guardar nota</button>
+          <a href={`/dashboard/pacientes/${pacienteId}/notas`} className={styles.btnGhost}>Cancelar</a>
         </div>
       </form>
     </div>
