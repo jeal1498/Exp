@@ -4,7 +4,7 @@ import { insertAuditLog } from '@/lib/supabase/audit'
 import { formatFecha, formatFechaHora } from '@/lib/format'
 import { actualizarBorrador, firmarBateria, generarInforme } from './actions'
 import { listDocumentos } from '@/lib/storage'
-import styles from '../../../../../pacientes.module.css'
+import styles from '../../../../pacientes.module.css'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = { title: 'Informe de Evaluación — Expedientes Clínicos' }
