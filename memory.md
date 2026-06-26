@@ -32,6 +32,7 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 | 6 | Integraciones de Salida (Storage y Alertas por Correo) | ✅ COMPLETADA |
 | 7 | Despliegue en Vercel | ✅ COMPLETADA |
 | 8 | Módulo de Baterías de Evaluación Neuropsicológica | ✅ COMPLETADA |
+| 9 | Expediente Completo PDF + Campos Tutor NOM-004 | ✅ COMPLETADA |
 
 ---
 
@@ -91,9 +92,9 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 
 ## Estado Actual del Proyecto
 
-**Sesión activa:** Sesión 21 — COMPLETADA  
-**Última actualización:** 2026-06-25  
-**Estado:** Proyecto en producción. Módulo de Baterías de Evaluación Neuropsicológica completo: 8 rutas, 6 formularios por instrumento, PDF con @react-pdf/renderer, firma SHA-256 NOM-004. Constantes migradas a `src/lib/evaluaciones/constants.ts`. Build limpio.
+**Sesión activa:** Sesión 22 — COMPLETADA  
+**Última actualización:** 2026-06-26  
+**Estado:** Proyecto en producción. Expediente Clínico Completo PDF implementado: 5 secciones NOM-004, route handler GET `/expediente/pdf`, página de descarga. Campos de tutor/responsable legal y datos demográficos adicionales agregados a `pacientes` (migración SQL aplicada). Build limpio.
 
 ---
 
@@ -786,6 +787,62 @@ Construir un **Sistema de Gestión de Expedientes Clínicos** para una neuropsic
 - `package.json`, `package-lock.json`
 
 **Estado al cerrar sesión:** Módulo de Baterías completo. Push directo a `main`. Producción pendiente de redeploy en Vercel.
+
+---
+
+### Sesión 22 — 2026-06-26
+**Objetivo:** Implementar prerrequisitos NOM-004 (campos de tutor/responsable) y Expediente Clínico Completo PDF.
+
+**Logrado:**
+
+**FASE 1 — Campos Tutor/Responsable Legal (NOM-004 art. 5.1)**
+
+- Migración SQL `supabase/migrations/20260626000001_pacientes_tutor_fields.sql`:
+  - 5 columnas nuevas en `public.pacientes`: `tutor_nombre TEXT`, `tutor_relacion TEXT CHECK (IN ...)`, `tutor_telefono TEXT`, `lugar_nacimiento TEXT`, `estado_civil TEXT CHECK (IN ...)`.
+  - Migración aplicada en producción vía Supabase MCP.
+- `src/types/database.types.ts`: 5 campos nuevos con tipos TypeScript exactos (union types para campos CHECK).
+- `src/app/dashboard/pacientes/nuevo/page.tsx`: fieldsets nuevos — `lugar_nacimiento`, `estado_civil`, y bloque completo de "Tutor / Responsable legal" (`tutor_nombre`, `tutor_relacion`, `tutor_telefono`).
+- `src/app/dashboard/pacientes/nuevo/actions.ts`: helper `calcularEdad()`, constantes TUTOR_RELACIONES y ESTADOS_CIVILES, validación server-side de tutor obligatorio para menores de 18 años, inserción de todos los campos nuevos.
+- `src/app/dashboard/pacientes/[pacienteId]/page.tsx`: consulta SELECT ampliada con 5 nuevos campos, display condicional de `lugar_nacimiento`, `estado_civil`, y sección de tutor en la ficha.
+
+**FASE 1.2 — SHA-256 (ya implementado)**
+- Verificado: `notas/[notaId]/actions.ts` y `evaluaciones/[evaluacionId]/actions.ts` ya tenían `import { createHash } from 'crypto'` con SHA-256 completo. Sin trabajo adicional necesario.
+
+**FASE 2 — Expediente Clínico Completo PDF**
+
+- `src/lib/pdf/pdfStyles.ts`: `StyleSheet` compartido (paleta `#382f51`, Helvetica, footer con borde superior).
+- `src/lib/pdf/sections/Portada.tsx`: portada completa como `<Page>` independiente con "DOCUMENTO CONFIDENCIAL", nombre del paciente, no. expediente, fecha.
+- `src/lib/pdf/sections/FichaIdentificacion.tsx`: §1 NOM-004 art. 5.1 — muestra edad calculada, tutor condicional (si < 18 años o si existe tutor_nombre).
+- `src/lib/pdf/sections/HistoriaClinica.tsx`: §2 NOM-004 art. 7.1 — JSONB `habitos` como lista clave-valor, JSONB `medicamentos_actuales` como tabla (nombre | dosis).
+- `src/lib/pdf/sections/EvaluacionesNeuro.tsx`: §3 — agrupa evaluaciones por `dominio` cognitivo, muestra SHA-256 y "BLOQUEADO" para registros inmutables.
+- `src/lib/pdf/sections/NotasEvolucion.tsx`: §4 — notas SOAP ordenadas cronológicamente, indicador "NOTA BLOQUEADA" para notas inmutables, código CIE-11.
+- `src/lib/pdf/sections/InformeDiagnostico.tsx`: §5 — baterías con `impresion_diagnostica` o `recomendaciones`, labels de tipo y estado, fecha de firma.
+- `src/lib/pdf/ExpedienteCompletoPDF.tsx`: componente raíz `<Document>` — `<Portada>` (Page) + `<Page>` principal con footer fijo de paginación `X / Y`.
+- `src/app/dashboard/pacientes/[pacienteId]/expediente/actions.ts`: `getExpedienteData()` — 5 consultas paralelas Supabase + audit log NOM-024 SELECT.
+- `src/app/dashboard/pacientes/[pacienteId]/expediente/pdf/route.ts`: GET route handler — auth → datos → dynamic import `@react-pdf/renderer` → `renderToBuffer()` → `NextResponse` con `Content-Type: application/pdf`.
+- `src/app/dashboard/pacientes/[pacienteId]/expediente/page.tsx`: página de descarga — conteos de evaluaciones/notas/baterías, botón de descarga al route handler.
+
+**Archivos creados (11):**
+- `supabase/migrations/20260626000001_pacientes_tutor_fields.sql`
+- `src/lib/pdf/pdfStyles.ts`
+- `src/lib/pdf/sections/Portada.tsx`
+- `src/lib/pdf/sections/FichaIdentificacion.tsx`
+- `src/lib/pdf/sections/HistoriaClinica.tsx`
+- `src/lib/pdf/sections/EvaluacionesNeuro.tsx`
+- `src/lib/pdf/sections/NotasEvolucion.tsx`
+- `src/lib/pdf/sections/InformeDiagnostico.tsx`
+- `src/lib/pdf/ExpedienteCompletoPDF.tsx`
+- `src/app/dashboard/pacientes/[pacienteId]/expediente/actions.ts`
+- `src/app/dashboard/pacientes/[pacienteId]/expediente/pdf/route.ts`
+
+**Archivos modificados (5):**
+- `src/types/database.types.ts`
+- `src/app/dashboard/pacientes/nuevo/page.tsx`
+- `src/app/dashboard/pacientes/nuevo/actions.ts`
+- `src/app/dashboard/pacientes/[pacienteId]/page.tsx`
+- `src/app/dashboard/pacientes/[pacienteId]/expediente/page.tsx`
+
+**Estado al cerrar sesión:** Expediente Completo PDF operativo. Datos de tutor/responsable en producción. Push directo a `main`.
 
 ---
 
