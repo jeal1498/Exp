@@ -20,7 +20,7 @@ export default async function PacienteDetallePage({
   const { data: paciente, error } = await supabase
     .from('pacientes')
     .select(
-      'id, numero_expediente, nombre, apellido_paterno, apellido_materno, fecha_nacimiento, curp, sexo, lateralidad, escolaridad, ocupacion, telefono, email, motivo_consulta, consentimiento_informado, consentimiento_fecha, created_at'
+      'id, numero_expediente, nombre, apellido_paterno, apellido_materno, fecha_nacimiento, curp, sexo, lateralidad, lugar_nacimiento, estado_civil, escolaridad, ocupacion, telefono, email, motivo_consulta, consentimiento_informado, consentimiento_fecha, tutor_nombre, tutor_relacion, tutor_telefono, created_at'
     )
     .eq('id', pacienteId)
     .eq('is_active', true)
@@ -76,6 +76,20 @@ export default async function PacienteDetallePage({
             <dt className={styles.metaLabel}>Lateralidad</dt>
             <dd className={styles.metaValue}>{paciente.lateralidad ?? '—'}</dd>
 
+            {paciente.lugar_nacimiento && (
+              <>
+                <dt className={styles.metaLabel}>Lugar de nacimiento</dt>
+                <dd className={styles.metaValue}>{paciente.lugar_nacimiento}</dd>
+              </>
+            )}
+
+            {paciente.estado_civil && (
+              <>
+                <dt className={styles.metaLabel}>Estado civil</dt>
+                <dd className={styles.metaValue}>{paciente.estado_civil}</dd>
+              </>
+            )}
+
             <dt className={styles.metaLabel}>Escolaridad</dt>
             <dd className={styles.metaValue}>{paciente.escolaridad ?? '—'}</dd>
 
@@ -113,6 +127,17 @@ export default async function PacienteDetallePage({
                 ? `Sí — ${paciente.consentimiento_fecha ?? ''}`
                 : 'No registrado'}
             </dd>
+
+            {paciente.tutor_nombre && (
+              <>
+                <dt className={styles.metaLabel}>Tutor / Responsable</dt>
+                <dd className={styles.metaValue}>
+                  {paciente.tutor_nombre}
+                  {paciente.tutor_relacion ? ` (${paciente.tutor_relacion})` : ''}
+                  {paciente.tutor_telefono ? ` — ${paciente.tutor_telefono}` : ''}
+                </dd>
+              </>
+            )}
 
             <dt className={styles.metaLabel}>Registrado</dt>
             <dd className={styles.metaValue}>{formatFecha(paciente.created_at)}</dd>
@@ -152,6 +177,14 @@ export default async function PacienteDetallePage({
                 className={styles.moduleLink}
               >
                 Documentos Adjuntos
+              </a>
+            </li>
+            <li className={styles.moduleItem}>
+              <a
+                href={`/dashboard/pacientes/${pacienteId}/expediente`}
+                className={styles.moduleLink}
+              >
+                Expediente Completo PDF
               </a>
             </li>
           </ul>

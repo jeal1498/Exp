@@ -32,6 +32,11 @@ export interface Database {
           diagnostico_previo: string | null
           consentimiento_informado: boolean
           consentimiento_fecha: string | null
+          tutor_nombre: string | null
+          tutor_relacion: 'Padre' | 'Madre' | 'Abuelo/a' | 'Tutor legal' | 'Otro' | null
+          tutor_telefono: string | null
+          lugar_nacimiento: string | null
+          estado_civil: 'Soltero/a' | 'Casado/a' | 'Divorciado/a' | 'Viudo/a' | 'Unión libre' | 'No aplica' | null
           created_by: string
           is_active: boolean
         }
@@ -57,6 +62,11 @@ export interface Database {
           diagnostico_previo?: string | null
           consentimiento_informado?: boolean
           consentimiento_fecha?: string | null
+          tutor_nombre?: string | null
+          tutor_relacion?: 'Padre' | 'Madre' | 'Abuelo/a' | 'Tutor legal' | 'Otro' | null
+          tutor_telefono?: string | null
+          lugar_nacimiento?: string | null
+          estado_civil?: 'Soltero/a' | 'Casado/a' | 'Divorciado/a' | 'Viudo/a' | 'Unión libre' | 'No aplica' | null
           created_by: string
           is_active?: boolean
         }
@@ -82,6 +92,11 @@ export interface Database {
           diagnostico_previo?: string | null
           consentimiento_informado?: boolean
           consentimiento_fecha?: string | null
+          tutor_nombre?: string | null
+          tutor_relacion?: 'Padre' | 'Madre' | 'Abuelo/a' | 'Tutor legal' | 'Otro' | null
+          tutor_telefono?: string | null
+          lugar_nacimiento?: string | null
+          estado_civil?: 'Soltero/a' | 'Casado/a' | 'Divorciado/a' | 'Viudo/a' | 'Unión libre' | 'No aplica' | null
           created_by?: string
           is_active?: boolean
         }
